@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FutureYou — Career Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:    #0a0a12;
+  --card:  rgba(255,255,255,0.05);
+  --bdr:   rgba(255,255,255,0.10);
+  --text:  #f0eeff;
+  --muted: #9490b8;
+  --a:     #7c5cfc;
+  --b:     #fc5c7d;
+  --c:     #43e8c8;
+}
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg); color: var(--text); min-height: 100vh;
+}
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 55% 45% at 15% 15%, rgba(124,92,252,.16) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 85% 85%, rgba(252,92,125,.13) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 60% 40%, rgba(67,232,200,.07)  0%, transparent 55%);
+}
+#app {
+  position: relative; z-index: 1; min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 32px 16px 56px;
+}
+.screen { display: none; width: 100%; max-width: 680px; flex-direction: column; align-items: center; }
+.screen.active { display: flex; animation: up .4s ease both; }
+@keyframes up { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
+
+/* shared */
+.badge {
+  font-size: 10px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--c); border: 1px solid rgba(67,232,200,.35);
+  padding: 5px 16px; border-radius: 100px; margin-bottom: 22px;
+}
+.grad {
+  background: linear-gradient(130deg, var(--a), var(--b) 50%, var(--c));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+
+/* HERO */
+#s-hero { min-height: 100vh; justify-content: center; }
+.h1 { font-family:'Syne',sans-serif; font-size:clamp(40px,8vw,70px); font-weight:800; line-height:1.0; text-align:center; margin-bottom:16px; }
+.hsub { font-size:15px; color:var(--muted); text-align:center; max-width:400px; line-height:1.7; margin-bottom:34px; }
+.pills { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:38px; }
+.pill { width:100px; height:64px; object-fit:cover; border-radius:100px; border:2px solid var(--bdr); opacity:.8; transition:opacity .2s,transform .2s; }
+.pill:hover { opacity:1; transform:scale(1.06); }
+.btn-hero {
+  font-family:'Inter',sans-serif; font-weight:600; font-size:15px;
+  background:linear-gradient(135deg,var(--a),var(--b)); color:#fff; border:none;
+  border-radius:100px; padding:16px 44px; cursor:pointer;
+  box-shadow:0 0 40px rgba(124,92,252,.4); transition:transform .2s,box-shadow .2s;
+}
+.btn-hero:hover { transform:translateY(-2px) scale(1.03); box-shadow:0 0 60px rgba(124,92,252,.55); }
+
+/* QUESTIONS */
+#s-question { min-height:100vh; justify-content:center; }
+.qprog { display:flex; align-items:center; gap:14px; width:100%; margin-bottom:26px; }
+.qstep { font-size:11px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); white-space:nowrap; }
+.qbw { flex:1; height:3px; background:var(--bdr); border-radius:4px; overflow:hidden; }
+.qb { height:100%; background:linear-gradient(90deg,var(--a),var(--b)); border-radius:4px; transition:width .5s ease; }
+.qcat { align-self:flex-start; font-size:10px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:var(--c); margin-bottom:11px; }
+.qimg { width:100%; height:175px; object-fit:cover; border-radius:16px; margin-bottom:20px; border:1px solid var(--bdr); }
+.qtxt { font-family:'Syne',sans-serif; font-size:clamp(17px,3vw,23px); font-weight:700; line-height:1.3; text-align:center; margin-bottom:24px; max-width:560px; }
+.qopts { display:grid; grid-template-columns:1fr 1fr; gap:10px; width:100%; margin-bottom:22px; }
+@media(max-width:460px){ .qopts{grid-template-columns:1fr;} }
+.opt {
+  background:var(--card); border:1.5px solid var(--bdr); border-radius:14px;
+  padding:13px 15px; cursor:pointer; text-align:left; color:var(--text);
+  font-family:'Inter',sans-serif; display:flex; align-items:flex-start; gap:10px;
+  transition:border-color .18s,transform .18s,background .18s; position:relative; overflow:hidden;
+}
+.opt::after { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(124,92,252,.10),rgba(252,92,125,.07)); opacity:0; transition:opacity .18s; }
+.opt:hover { border-color:var(--a); transform:translateY(-2px); }
+.opt:hover::after { opacity:1; }
+.opt.sel { border-color:var(--a); background:rgba(124,92,252,.13); }
+.opt.sel::after { opacity:1; }
+.oe { font-size:19px; flex-shrink:0; margin-top:1px; }
+.ol { font-size:13px; font-weight:500; }
+.od { font-size:11px; color:var(--muted); margin-top:2px; }
+.btn-next {
+  font-family:'Inter',sans-serif; font-weight:600; font-size:14px;
+  background:linear-gradient(135deg,var(--a),var(--b)); color:#fff; border:none;
+  border-radius:100px; padding:14px 40px; cursor:pointer;
+  opacity:.3; pointer-events:none; transition:opacity .2s,transform .2s,box-shadow .2s;
+}
+.btn-next.on { opacity:1; pointer-events:all; }
+.btn-next.on:hover { transform:translateY(-2px); box-shadow:0 0 40px rgba(124,92,252,.4); }
+
+/* LOADING */
+#s-loading { min-height:100vh; justify-content:center; gap:16px; }
+.orb { width:68px; height:68px; border-radius:50%; background:linear-gradient(135deg,var(--a),var(--b),var(--c)); animation:pulse 1.4s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{transform:scale(1);opacity:1;} 50%{transform:scale(1.18);opacity:.7;} }
+.ltxt { font-size:16px; font-weight:500; color:var(--muted); }
+.dots { display:flex; gap:7px; }
+.dot { width:7px; height:7px; border-radius:50%; background:var(--a); animation:bd 1.2s ease-in-out infinite; }
+.dot:nth-child(2){ animation-delay:.2s; background:var(--b); }
+.dot:nth-child(3){ animation-delay:.4s; background:var(--c); }
+@keyframes bd { 0%,80%,100%{transform:scale(.6);opacity:.3;} 40%{transform:scale(1.2);opacity:1;} }
+
+/* RESULTS */
+#s-results { align-items:stretch; padding-top:8px; }
+.rhead { text-align:center; margin-bottom:26px; }
+.rhead h2 { font-family:'Syne',sans-serif; font-size:clamp(22px,4vw,34px); font-weight:800; margin-bottom:9px; }
+.rhead p  { font-size:14px; color:var(--muted); line-height:1.7; max-width:400px; margin:0 auto; }
+
+/* career cards */
+.clist { display:flex; flex-direction:column; gap:12px; width:100%; margin-bottom:20px; }
+.cc {
+  width:100%; display:flex; flex-direction:row;
+  background:var(--card); border:1px solid var(--bdr); border-radius:16px;
+  overflow:hidden; transition:transform .22s,border-color .22s; animation:up .5s ease both;
+}
+.cc:nth-child(2){ animation-delay:.07s; }
+.cc:nth-child(3){ animation-delay:.14s; }
+.cc:hover { transform:translateY(-3px); border-color:rgba(124,92,252,.38); }
+.cc-bar  { width:4px; flex-shrink:0; }
+.cc-img  { width:120px; flex-shrink:0; object-fit:cover; display:block; }
+.cc-body { flex:1; min-width:0; padding:16px 18px; display:flex; flex-direction:column; gap:6px; }
+.cc-rank {
+  display:inline-block; font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  padding:3px 10px; border-radius:100px; width:fit-content;
+}
+.cc-title { font-family:'Syne',sans-serif; font-size:16px; font-weight:800; line-height:1.2; }
+.cc-desc  { font-size:12.5px; color:var(--muted); line-height:1.65; }
+.cc-stats { display:flex; gap:6px; flex-wrap:wrap; margin-top:2px; }
+.cc-stat  {
+  flex:1; min-width:110px; background:rgba(255,255,255,.05); border:1px solid var(--bdr);
+  border-radius:8px; padding:7px 11px; display:flex; flex-direction:column; gap:1px;
+}
+.cc-sv { font-size:12px; font-weight:700; }
+.cc-sl { font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
+@media(max-width:480px){
+  .cc { flex-direction:column; }
+  .cc-bar { width:100%; height:4px; }
+  .cc-img { width:100%; height:110px; }
+}
+
+/* EXPLORER */
+.explorer {
+  width:100%; background:var(--card); border:1px solid var(--bdr);
+  border-radius:16px; padding:22px; margin-bottom:18px; position:relative; overflow:hidden;
+}
+.explorer::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg,var(--a),var(--b),var(--c));
+}
+.ex-title { font-family:'Syne',sans-serif; font-size:15px; font-weight:800; margin-bottom:5px; }
+.ex-sub   { font-size:12.5px; color:var(--muted); line-height:1.6; margin-bottom:14px; }
+.ex-row   { display:flex; gap:8px; }
+.ex-in {
+  flex:1; background:rgba(255,255,255,.07); border:1.5px solid var(--bdr);
+  border-radius:10px; padding:11px 14px; color:var(--text);
+  font-family:'Inter',sans-serif; font-size:14px; outline:none; transition:border-color .2s;
+}
+.ex-in::placeholder { color:var(--muted); }
+.ex-in:focus { border-color:var(--a); }
+.ex-btn {
+  font-family:'Inter',sans-serif; font-weight:600; font-size:13px;
+  background:linear-gradient(135deg,var(--a),var(--b)); color:#fff; border:none;
+  border-radius:10px; padding:11px 20px; cursor:pointer; white-space:nowrap;
+  transition:transform .18s,box-shadow .18s;
+}
+.ex-btn:hover { transform:translateY(-1px); box-shadow:0 0 26px rgba(124,92,252,.4); }
+
+/* explorer result */
+.ex-res { display:none; margin-top:18px; border-top:1px solid var(--bdr); padding-top:18px; }
+.ex-res.show { display:block; animation:up .35s ease both; }
+.er-head { display:flex; align-items:center; gap:11px; margin-bottom:5px; }
+.er-emo  { font-size:30px; }
+.er-name { font-family:'Syne',sans-serif; font-size:17px; font-weight:800; }
+.er-fld  { font-size:11px; color:var(--muted); margin-top:1px; }
+.er-q    { font-size:13px; color:var(--c); font-style:italic; line-height:1.6; margin-bottom:14px; }
+.er-grid { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+@media(max-width:460px){ .er-grid{grid-template-columns:1fr;} }
+.er-card { background:rgba(255,255,255,.04); border:1px solid var(--bdr); border-radius:11px; padding:12px 14px; }
+.er-ct   { font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; }
+.er-card ul { padding-left:14px; }
+.er-card li { font-size:12.5px; color:var(--muted); line-height:1.65; margin-bottom:2px; }
+.er-none { font-size:13px; color:var(--muted); margin-top:12px; line-height:1.6; }
+
+.btn-restart {
+  font-family:'Inter',sans-serif; font-weight:600; font-size:13px;
+  background:transparent; color:var(--muted); border:1.5px solid var(--bdr);
+  border-radius:100px; padding:12px 32px; cursor:pointer; transition:all .2s; align-self:center;
+}
+.btn-restart:hover { border-color:var(--a); color:var(--text); }
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- HERO -->
+<div class="screen active" id="s-hero">
+  <div class="badge">✦ Your future starts here</div>
+  <h1 class="h1">Find your<br><span class="grad">future career</span></h1>
+  <p class="hsub">Answer 13 questions about your personality and interests — we'll match you with careers that truly fit who you are.</p>
+  <div class="pills">
+    <img class="pill" src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=220&q=80" alt="nurse">
+    <img class="pill" src="https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=220&q=80" alt="police">
+    <img class="pill" src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=220&q=80" alt="technology">
+    <img class="pill" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=220&q=80" alt="person">
+    <img class="pill" src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=220&q=80" alt="education">
+  </div>
+  <button class="btn-hero" onclick="startQuiz()">Get Started →</button>
+</div>
+
+<!-- QUESTION -->
+<div class="screen" id="s-question">
+  <div class="qprog">
+    <span class="qstep" id="qstep">Question 1 of 13</span>
+    <div class="qbw"><div class="qb" id="qb" style="width:0%"></div></div>
+    <span class="qstep" id="qpct">0%</span>
+  </div>
+  <span class="qcat" id="qcat"></span>
+  <img class="qimg" id="qimg" src="" alt="">
+  <p class="qtxt" id="qtxt"></p>
+  <div class="qopts" id="qopts"></div>
+  <button class="btn-next" id="btn-next" onclick="nextQ()">Continue →</button>
+</div>
+
+<!-- LOADING -->
+<div class="screen" id="s-loading">
+  <div class="orb"></div>
+  <p class="ltxt">Analysing your answers…</p>
+  <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+</div>
+
+<!-- RESULTS -->
+<div class="screen" id="s-results">
+  <div class="rhead">
+    <div class="badge" style="display:inline-block">✦ Your matches</div>
+    <h2>Your top 3 <span class="grad">career paths</span></h2>
+    <p>Based on your personality, interests and strengths — the careers that suit you best.</p>
+  </div>
+
+  <div class="clist" id="clist"></div>
+
+  <div class="explorer">
+    <div class="ex-title">🔍 Do you want to explore what a career requires?</div>
+    <div class="ex-sub">Type any profession — police officer, nurse, chef, pilot, architect — and get an instant breakdown of personality fit, interests and what you need to enjoy about the day-to-day work.</div>
+    <div class="ex-row">
+      <input class="ex-in" id="ex-in" type="text" placeholder="e.g. Police officer, Nurse, Chef, Engineer…" maxlength="60"
+        onkeydown="if(event.key==='Enter') explore()">
+      <button class="ex-btn" onclick="explore()">Search →</button>
+    </div>
+    <div class="ex-res" id="ex-res"></div>
+  </div>
+
+  <button class="btn-restart" onclick="restart()">↩ Start over</button>
+</div>
+
+</div><!-- /app -->
+<script>
+/* ══════════════════════════════════════════
+   QUESTIONS  (13)
+══════════════════════════════════════════ */
+const Qs = [
+  { cat:"🧠 How You Think",
+    txt:"When you face a difficult problem — what's your first instinct?",
+    img:"https://images.unsplash.com/photo-1456406644174-8ddd4cd52a06?w=760&q=80",
+    opts:[
+      {e:"📊",l:"Analyse the facts and numbers",    d:"Break it down logically, step by step",   t:["analytical","data","STEM","technical"]},
+      {e:"🎨",l:"Sketch or visualise it",            d:"Draw it out and make it concrete",         t:["creative","visual","design","art"]},
+      {e:"🤝",l:"Talk it through with others",       d:"Collaboration sparks the best ideas",      t:["social","leadership","communication","teamwork"]},
+      {e:"🔬",l:"Experiment until it works",         d:"Try, fail, learn and try again",           t:["science","research","hands-on","practical"]}
+    ]},
+  { cat:"🌍 Your Motivation",
+    txt:"What kind of impact do you most want to have on the world?",
+    img:"https://images.unsplash.com/photo-1500964757637-c85e8a162699?w=760&q=80",
+    opts:[
+      {e:"🛡️",l:"Protect people and keep them safe", d:"Safety, justice and emergency response",   t:["safety","protective","police","emergency","justice","law"]},
+      {e:"🏥",l:"Improve people's health",            d:"Help people live better and longer lives", t:["health","medicine","care","nursing","medical"]},
+      {e:"🤖",l:"Advance technology and science",     d:"Build tomorrow's tools and solutions",     t:["technology","AI","engineering","digital","science"]},
+      {e:"⚖️",l:"Create a fairer society",            d:"Education, law and reducing inequality",   t:["social","policy","law","education","justice","service"]}
+    ]},
+  { cat:"📅 Work Environment",
+    txt:"Which work setting feels most like you?",
+    img:"https://images.unsplash.com/photo-1497366216548-37526070297c?w=760&q=80",
+    opts:[
+      {e:"🏠",l:"Flexible — remote or varied locations", d:"Freedom to choose where and when I work",      t:["remote","digital","independent","creative","flexible"]},
+      {e:"🏢",l:"A busy office, clinic or studio",       d:"The energy of a team around me every day",     t:["collaborative","office","business","teamwork"]},
+      {e:"🌿",l:"Outdoors, on-site or on the move",      d:"Variety, movement and the real world",         t:["hands-on","outdoor","physical","active","fieldwork","trade"]},
+      {e:"🔭",l:"Lab, classroom or focused workspace",   d:"Deep concentration and quiet, focused work",   t:["science","research","focused","medical","laboratory","teaching"]}
+    ]},
+  { cat:"🎓 Favourite Subjects",
+    txt:"Which subjects did you enjoy most at school?",
+    img:"https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=760&q=80",
+    opts:[
+      {e:"📐",l:"Maths and science",          d:"Numbers, formulas and discoveries",            t:["STEM","analytical","engineering","data","technical"]},
+      {e:"🖌️",l:"Art, music and design",      d:"Expressing ideas creatively and visually",     t:["creative","design","art","media","music","crafts"]},
+      {e:"📖",l:"Languages and literature",   d:"Writing, stories and communication",           t:["communication","writing","social","law","languages","journalism"]},
+      {e:"🌱",l:"Biology and the environment",d:"Living things, health and the natural world",  t:["science","environment","health","biology","medical","nature"]}
+    ]},
+  { cat:"💡 What You Value",
+    txt:"What matters most to you in a future career?",
+    img:"https://images.unsplash.com/photo-1552664730-d307ca884978?w=760&q=80",
+    opts:[
+      {e:"📈",l:"Good pay and financial security", d:"Stability for me and my future",                  t:["finance","tech","law","business","practical","management"]},
+      {e:"🌟",l:"Meaning and purpose",             d:"Knowing my work genuinely matters",               t:["social","health","education","environment","service","caring"]},
+      {e:"🚀",l:"Variety, excitement and action",  d:"No two days the same — I thrive on that",         t:["active","creative","fieldwork","adventure","action","police"]},
+      {e:"🧘",l:"Balance and wellbeing",           d:"A stable and healthy everyday life",              t:["remote","education","wellness","design","routine","teaching"]}
+    ]},
+  { cat:"🤝 People or Things?",
+    txt:"What do you prefer spending most of your day doing?",
+    img:"https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=760&q=80",
+    opts:[
+      {e:"👥",l:"Helping, caring for or teaching people", d:"Direct support for individuals",          t:["social","health","education","leadership","service","caring","nursing"]},
+      {e:"💻",l:"Working with technology and systems",    d:"Code, data and digital tools",            t:["tech","AI","engineering","data","digital","analytical"]},
+      {e:"🔧",l:"Building, fixing or creating things",   d:"Hands-on, physical, tangible results",    t:["engineering","hands-on","practical","trade","crafts","construction"]},
+      {e:"📚",l:"Reading, writing and researching",      d:"Intellectual deep work",                  t:["research","law","writing","science","analytical","journalism"]}
+    ]},
+  { cat:"🌐 The Big Picture",
+    txt:"Which future challenge inspires you most to work on?",
+    img:"https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=760&q=80",
+    opts:[
+      {e:"🧬",l:"Health and medical breakthroughs",  d:"Better treatments, longer healthy lives",    t:["health","medical","science","nursing","biology","caring"]},
+      {e:"☀️",l:"Climate and the environment",        d:"Renewable energy and sustainability",        t:["environment","engineering","green","sustainability","nature"]},
+      {e:"🛡️",l:"Safety, justice and community",     d:"Protecting people and upholding the law",   t:["justice","law","police","safety","protective","social"]},
+      {e:"🤖",l:"Technology, AI and innovation",      d:"Building the digital future",               t:["AI","tech","data","engineering","digital"]}
+    ]},
+  { cat:"⚡ Your Superpower",
+    txt:"How would your friends most likely describe you?",
+    img:"https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=760&q=80",
+    opts:[
+      {e:"🧩",l:"The problem-solver",      d:"Always finds a clever way forward",              t:["analytical","engineering","data","tech","practical","detective"]},
+      {e:"✨",l:"The creative one",         d:"Fresh perspectives and original ideas",          t:["creative","design","art","writing","media","music","crafts"]},
+      {e:"🌊",l:"The empathetic listener", d:"People feel truly understood around you",        t:["health","social","education","leadership","caring","counselling","nursing"]},
+      {e:"🔥",l:"The driven leader",       d:"Sets goals and rallies people around them",      t:["leadership","business","policy","management","law","police"]}
+    ]},
+  { cat:"😌 Social Energy",
+    txt:"After a long, social day — what recharges you most?",
+    img:"https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=760&q=80",
+    opts:[
+      {e:"🧘",l:"Quiet time alone",           d:"Reading, thinking or simply unwinding",         t:["introverted","research","writing","analytical","independent","technical","focused"]},
+      {e:"🎉",l:"More time with people!",     d:"Social energy genuinely drives me forward",     t:["extroverted","social","service","teamwork","leadership","communication","teaching"]},
+      {e:"🎮",l:"A creative or digital hobby",d:"Gaming, music, art or tinkering",              t:["creative","design","digital","practical","crafts","media","tech"]},
+      {e:"🏃",l:"Physical exercise or sport", d:"Moving my body clears my head",                t:["active","physical","fieldwork","hands-on","outdoor","sport","police"]}
+    ]},
+  { cat:"💬 Communication Style",
+    txt:"When sharing an idea — what comes most naturally to you?",
+    img:"https://images.unsplash.com/photo-1543269865-cbf427effbad?w=760&q=80",
+    opts:[
+      {e:"🗣️",l:"Talking and persuading",   d:"I love conversations, debates and presenting", t:["communication","leadership","law","social","teaching","journalism","extroverted"]},
+      {e:"✍️",l:"Writing it out clearly",   d:"I express myself best in writing",             t:["writing","research","law","analytical","journalism","creative","introverted"]},
+      {e:"🎨",l:"Showing it visually",       d:"Sketches, images or making something tangible",t:["design","visual","creative","art","media","architecture","crafts"]},
+      {e:"🤫",l:"Listening first, then responding",d:"I observe carefully before I speak",     t:["counselling","caring","research","analytical","empathy","health","nursing"]}
+    ]},
+  { cat:"🎭 Team Role",
+    txt:"In a group project — which role do you naturally fall into?",
+    img:"https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=760&q=80",
+    opts:[
+      {e:"🧭",l:"The organiser and leader", d:"Takes charge and keeps things moving",          t:["leadership","management","business","police","organisation","law"]},
+      {e:"💡",l:"The ideas generator",      d:"Comes up with creative angles others miss",     t:["creative","innovation","design","research","media","entrepreneurship","art"]},
+      {e:"🛠️",l:"The one who gets it done", d:"Builds, executes and delivers",                t:["practical","engineering","trade","hands-on","crafts","technical","construction"]},
+      {e:"🌉",l:"The connector",            d:"Makes sure everyone works well together",       t:["social","HR","counselling","teamwork","education","service","caring"]}
+    ]},
+  { cat:"😬 Risk and Pressure",
+    txt:"How do you feel about uncertainty, risk and pressure?",
+    img:"https://images.unsplash.com/photo-1518135714426-c18f5ffb6f4d?w=760&q=80",
+    opts:[
+      {e:"🔥",l:"I thrive under pressure",          d:"Stress and urgency make me sharper",         t:["police","emergency","surgery","military","active","fieldwork","action","medicine"]},
+      {e:"📋",l:"I prefer clear rules and structure",d:"Clear expectations help me perform my best", t:["law","finance","administration","teaching","nursing","routine","accounting"]},
+      {e:"🌱",l:"I like manageable challenges",      d:"Gradual progress and steady improvement",    t:["education","counselling","research","design","environment","wellness","social"]},
+      {e:"🚀",l:"I love calculated risk-taking",     d:"Bold goals require brave decisions",         t:["entrepreneurship","business","tech","investment","innovation","startup","creative"]}
+    ]},
+  { cat:"❤️ What Moves You",
+    txt:"Which of these would make you feel most proud?",
+    img:"https://images.unsplash.com/photo-1471107340929-a87cd0f5b5f3?w=760&q=80",
+    opts:[
+      {e:"🏥",l:"Helping someone through a health crisis", d:"Being there when people need it most",         t:["nursing","medicine","health","caring","emergency","social","counselling","medical"]},
+      {e:"🔓",l:"Solving a mystery or delivering justice", d:"Finding the truth and making things right",    t:["police","detective","law","justice","investigation","analytical","research"]},
+      {e:"🏗️",l:"Seeing something I built still standing", d:"A bridge, an app, a building — my creation", t:["engineering","architecture","construction","tech","design","crafts","practical"]},
+      {e:"📣",l:"Inspiring or educating an audience",      d:"Sharing knowledge that changes lives",         t:["teaching","education","journalism","media","communication","writing","social"]}
+    ]}
+];
+
+/* ══════════════════════════════════════════
+   CAREER DATABASE  (EUR salaries, monthly)
+══════════════════════════════════════════ */
+const Careers = [
+  {t:"Nurse / Registered Nurse",       tags:["nursing","health","caring","medical","social","service","practical","biology","medicine","emergency"],          col:"#fc5c7d", img:"https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=320&q=80", desc:"Nurses are the backbone of healthcare — providing direct patient care, emotional support and life-saving interventions every single day.",                  salary:"€2,800–€4,500/mo",  outlook:"⭐ Always in demand"},
+  {t:"Doctor / Physician",             tags:["medicine","health","science","biology","medical","caring","analytical","research","STEM"],                       col:"#fc5c7d", img:"https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=320&q=80", desc:"Diagnose illness and treat patients. Demanding but one of the most meaningful and respected careers in any society.",                                      salary:"€5,500–€14,000/mo", outlook:"⭐ Very stable"},
+  {t:"Paramedic / Emergency Responder",tags:["emergency","health","active","fieldwork","physical","police","action","caring","medicine"],                      col:"#fc5c7d", img:"https://images.unsplash.com/photo-1587745416684-47953f16f02f?w=320&q=80", desc:"First on scene in life-or-death situations — medical skill meets calm decisiveness under extreme pressure.",                                              salary:"€2,500–€4,000/mo",  outlook:"⭐ Very stable"},
+  {t:"Counsellor / Therapist",         tags:["counselling","social","empathy","caring","health","education","introverted","psychology","focused"],              col:"#7c5cfc", img:"https://images.unsplash.com/photo-1573497620053-ea5300f94f21?w=320&q=80", desc:"Support people through life's hardest emotional moments. Mental health professionals are in critical and growing demand everywhere.",                       salary:"€2,800–€4,500/mo",  outlook:"⭐ Growing fast"},
+  {t:"Physiotherapist",                tags:["health","physical","active","caring","medical","practical","hands-on","biology","sport"],                        col:"#43e8c8", img:"https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=320&q=80", desc:"Help people recover from injury and regain movement. Work in hospitals, sports clubs and private clinics.",                                               salary:"€2,800–€4,200/mo",  outlook:"⭐ Stable"},
+  {t:"Midwife",                        tags:["nursing","health","caring","medical","social","empathy","biology","nature"],                                     col:"#fc5c7d", img:"https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?w=320&q=80", desc:"Support women through pregnancy and childbirth. One of healthcare's most joyful and meaningful roles.",                                                   salary:"€3,000–€4,400/mo",  outlook:"⭐ Very stable"},
+  {t:"Police Officer",                 tags:["police","justice","safety","law","social","active","fieldwork","leadership","protective","action"],               col:"#7c5cfc", img:"https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=320&q=80", desc:"Protect communities, uphold the law and respond to crises. One of the most varied and community-rooted careers.",                                         salary:"€2,400–€4,500/mo",  outlook:"⭐ Very stable"},
+  {t:"Lawyer / Solicitor",             tags:["law","justice","analytical","writing","communication","leadership","business","social","introverted"],            col:"#7c5cfc", img:"https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=320&q=80", desc:"Argue cases and help people navigate complex legal systems. Combines rigorous thinking with high-stakes communication.",                                   salary:"€4,000–€12,000/mo", outlook:"⭐ Stable"},
+  {t:"Social Worker",                  tags:["social","service","caring","education","law","justice","empathy","counselling","teamwork"],                      col:"#fc5c7d", img:"https://images.unsplash.com/photo-1573497620215-d6f3f2f50c49?w=320&q=80", desc:"Advocate for vulnerable people — children, families and adults in crisis. A deeply human-centred role.",                                                  salary:"€2,400–€3,800/mo",  outlook:"⭐ Very stable"},
+  {t:"Criminal Investigator / Detective",tags:["detective","police","justice","analytical","research","law","investigation","introverted","focused"],           col:"#7c5cfc", img:"https://images.unsplash.com/photo-1614028674026-a65e31bfd27c?w=320&q=80", desc:"Solve crimes, gather evidence and ensure justice is served. Requires sharp analytical thinking and tireless persistence.",                                  salary:"€2,800–€5,000/mo",  outlook:"⭐ Stable"},
+  {t:"Teacher / Educator",             tags:["teaching","education","social","communication","leadership","service","routine","caring","teamwork"],             col:"#43e8c8", img:"https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=320&q=80", desc:"Shape young minds and open doors that change lives. Teaching is one of the most impactful jobs in any society.",                                           salary:"€2,500–€4,000/mo",  outlook:"⭐ Very stable"},
+  {t:"School Psychologist",            tags:["education","counselling","psychology","social","empathy","caring","focused","analytical"],                       col:"#7c5cfc", img:"https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?w=320&q=80", desc:"Support children's emotional health and learning in school. A blend of psychology, listening and educational insight.",                                   salary:"€3,000–€4,600/mo",  outlook:"⭐ Growing"},
+  {t:"Software Developer",             tags:["tech","digital","engineering","analytical","STEM","data","remote","practical","technical"],                      col:"#7c5cfc", img:"https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=320&q=80", desc:"Build the apps and systems that billions of people use every day. One of the most in-demand skills in the world.",                                         salary:"€4,000–€10,000/mo", outlook:"📈 Very high demand"},
+  {t:"AI & Data Scientist",            tags:["AI","data","analytical","STEM","tech","research","engineering","introverted","focused"],                         col:"#7c5cfc", img:"https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=320&q=80", desc:"Use machine learning and statistics to build intelligent systems. AI expertise is our era's most sought-after skill.",                                      salary:"€5,500–€12,000/mo", outlook:"📈 Critical demand"},
+  {t:"Cybersecurity Analyst",          tags:["tech","digital","analytical","STEM","data","technical","focused","research","law"],                              col:"#43e8c8", img:"https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=320&q=80", desc:"Defend organisations against hackers and digital threats. Mission-critical in an increasingly digital world.",                                             salary:"€4,200–€9,000/mo",  outlook:"📈 Critical demand"},
+  {t:"Graphic Designer",               tags:["design","creative","visual","art","media","communication","independent","digital","crafts"],                     col:"#fc5c7d", img:"https://images.unsplash.com/photo-1561070791-2526d30994b5?w=320&q=80", desc:"Communicate ideas through visual storytelling — advertising, games, publishing, film and digital media.",                                                   salary:"€2,200–€6,000/mo",  outlook:"📈 Steady"},
+  {t:"Architect",                      tags:["architecture","design","creative","STEM","engineering","visual","practical","analytical","construction"],        col:"#43e8c8", img:"https://images.unsplash.com/photo-1486325212027-8081e485255e?w=320&q=80", desc:"Design the buildings and spaces where life happens — homes, hospitals, public places and entire city districts.",                                           salary:"€3,200–€8,000/mo",  outlook:"📈 Steady"},
+  {t:"UX / Product Designer",          tags:["design","creative","tech","visual","digital","research","analytical","communication","empathy"],                 col:"#7c5cfc", img:"https://images.unsplash.com/photo-1561070791-2526d30994b5?w=320&q=80", desc:"Shape how billions interact with digital products. UX sits at the crossroads of empathy, creativity and technology.",                                      salary:"€4,000–€9,000/mo",  outlook:"📈 High demand"},
+  {t:"Environmental Scientist",        tags:["environment","science","research","biology","green","outdoor","analytical","fieldwork","nature"],                col:"#43e8c8", img:"https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=320&q=80", desc:"Study and protect the natural world — monitoring pollution, advising on conservation and combating climate change.",                                         salary:"€2,800–€5,500/mo",  outlook:"📈 Growing"},
+  {t:"Accountant / Financial Analyst", tags:["finance","business","analytical","STEM","routine","law","management","practical","accounting"],                  col:"#43e8c8", img:"https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=320&q=80", desc:"Manage money, audit companies and help organisations make smart financial decisions. Found in every industry.",                                              salary:"€3,000–€7,500/mo",  outlook:"⭐ Very stable"},
+  {t:"Chef / Culinary Professional",   tags:["creative","practical","hands-on","crafts","art","physical","service","food","extroverted"],                      col:"#fc5c7d", img:"https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=320&q=80", desc:"Create culinary experiences that bring people joy. Chefs combine artistry, precision and a passion for food and culture.",                                  salary:"€2,000–€5,500/mo",  outlook:"⭐ Stable"},
+  {t:"Electrician / Skilled Tradesperson",tags:["trade","hands-on","practical","technical","physical","engineering","crafts","routine","construction"],        col:"#43e8c8", img:"https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=320&q=80", desc:"Keep the world running. Electricians and plumbers are always in demand and can build very successful independent businesses.",                               salary:"€2,600–€6,000/mo",  outlook:"⭐ Very stable"},
+  {t:"Journalist / Reporter",          tags:["journalism","writing","communication","social","investigation","media","analytical","creative","extroverted"],    col:"#fc5c7d", img:"https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=320&q=80", desc:"Investigate, report and tell stories that matter. Journalism holds power to account and keeps the public informed.",                                        salary:"€2,200–€5,000/mo",  outlook:"⚡ Competitive"},
+  {t:"Psychologist",                   tags:["psychology","research","analytical","health","counselling","social","introverted","science","focused","empathy"],col:"#7c5cfc", img:"https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=320&q=80", desc:"Study the human mind and help people understand their thoughts and behaviour. Psychology touches every corner of society.",                                   salary:"€3,400–€7,000/mo",  outlook:"⭐ Growing"},
+  {t:"Civil / Mechanical Engineer",    tags:["engineering","STEM","hands-on","practical","construction","analytical","design","technical","fieldwork"],        col:"#43e8c8", img:"https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=320&q=80", desc:"Design and build infrastructure — bridges, machines, energy systems. Engineering shapes the physical world we live in.",                                     salary:"€3,700–€8,000/mo",  outlook:"⭐ Stable"},
+  {t:"Entrepreneur / Startup Founder", tags:["entrepreneurship","business","leadership","innovation","startup","creative","risk","social","extroverted"],      col:"#fc5c7d", img:"https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=320&q=80", desc:"Build something from nothing. Founders solve problems, take risks and sometimes change the world in the process.",                                           salary:"Variable",           outlook:"🚀 High risk, high reward"},
+  {t:"Musician / Performer",           tags:["music","creative","art","media","performance","social","extroverted","independent","crafts"],                    col:"#fc5c7d", img:"https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=320&q=80", desc:"Create and perform music that moves people emotionally. A challenging, competitive and deeply passionate career path.",                                      salary:"Variable",           outlook:"⚡ Competitive"}
+];
+
+/* ══════════════════════════════════════════
+   CAREER EXPLORER KNOWLEDGE BASE
+══════════════════════════════════════════ */
+const KB = [
+  { keys:["police","police officer","cop","detective","constable","officer"],
+    emoji:"🚔", field:"Law Enforcement & Justice",
+    quote:"Every day a police officer makes a difference for real people in real situations — that's what drives them.",
+    personality:["Calm and decisive under pressure","Strong sense of justice and integrity","Empathetic yet firm and authoritative","Loyal team player with natural leadership"],
+    interests:["Community safety and justice","Physical training and fitness","Criminology and human behaviour","Law and social order"],
+    like:["Working with people in difficult situations","Varied and unpredictable working days","Physically and mentally challenging tasks","Making communities safer"],
+    need:["Physical and mental resilience","Communication and conflict resolution","Teamwork and situational leadership","Ethics and sound judgement"]},
+
+  { keys:["nurse","nursing","registered nurse","midwife","healthcare assistant","paramedic"],
+    emoji:"🏥", field:"Healthcare & Nursing",
+    quote:"You are often the person patients remember most — not the doctor, but the one who held their hand.",
+    personality:["Deeply empathetic and compassionate","Calm and composed in stressful moments","Meticulous and highly responsible","Driven by a genuine desire to help"],
+    interests:["Medical science and the human body","Human relationships and direct care","Healthcare technology and procedures","Public health and society"],
+    like:["Direct patient contact every day","Working in a close, bonded team","Making quick decisions in critical moments","Seeing patients recover and improve"],
+    need:["Clinical and medical competence","Emotional strength and resilience","Accuracy, attention to detail and reliability","Clear communication with patients and colleagues"]},
+
+  { keys:["doctor","physician","surgeon","gp","general practitioner","specialist"],
+    emoji:"🩺", field:"Medicine & Healthcare",
+    quote:"Medicine is the art of combining science with compassion — every patient is a unique puzzle.",
+    personality:["Analytically curious and scientifically minded","Patient and methodical in approach","Empathetic yet professionally grounded","Deeply committed and responsible"],
+    interests:["Biology and medical science","Problem-solving and complex diagnostics","Human physiology and anatomy","Research and medical advancement"],
+    like:["Solving complex diagnostic challenges","Building long-term patient relationships","Continuous learning and medical research","Making decisive differences to people's lives"],
+    need:["Deep and broad medical knowledge","Decisiveness under pressure","Clear communication with patients and families","Commitment to lifelong learning"]},
+
+  { keys:["chef","cook","baker","pastry chef","head chef","culinary","kitchen"],
+    emoji:"👨‍🍳", field:"Culinary Arts & Gastronomy",
+    quote:"Seeing guests' faces when they take the first bite of something you created — that is priceless.",
+    personality:["Creative and highly sensory","Resilient and quick-thinking under pressure","Perfectionist with an eye for detail","Passionate about ingredients and flavours"],
+    interests:["Cooking, baking and food preparation","Sourcing quality produce","Global food cultures and traditions","The creative process behind a great menu"],
+    like:["Working with your hands to create","Fast-paced, intense service periods","Experimenting with flavours and techniques","Seeing satisfied guests enjoy your food"],
+    need:["Refined sense of taste and smell","Speed and physical precision","Stress tolerance in a hectic environment","Creativity balanced with strict discipline"]},
+
+  { keys:["architect","architecture","urban planner","landscape architect","interior designer"],
+    emoji:"🏛️", field:"Architecture & Design",
+    quote:"You don't just draw buildings — you create the places where people's lives unfold.",
+    personality:["Creative and strongly visual","Analytical with a technical mindset","Patient with long, complex projects","Collaborative and highly communicative"],
+    interests:["Form, space and aesthetics","Building technology and materials","Urban planning and society","History and architectural heritage"],
+    like:["Drawing and visualising bold ideas","Blending art with engineering and science","Watching a project grow from sketch to reality","Working with diverse creative teams"],
+    need:["Strong spatial and visual awareness","Technical understanding of construction","Computer-aided design tools (CAD, BIM)","Clear communication with clients and contractors"]},
+
+  { keys:["pilot","airline pilot","captain","co-pilot","helicopter pilot","aviator","flight"],
+    emoji:"✈️", field:"Aviation & Transport",
+    quote:"Flying is a craft that demands precision, calm and endless dedication to your training.",
+    personality:["Calm, disciplined and methodical","Analytically precise and detail-focused","Deeply responsible and duty-bound","Independent yet fully committed to teamwork"],
+    interests:["Aviation and aeronautics","Meteorology and navigation","Advanced engineering and aircraft systems","Geography and the wider world"],
+    like:["Working with highly advanced technology","Taking full responsibility for passenger safety","Travelling and experiencing different countries","Solving complex navigation and weather challenges"],
+    need:["Exceptional spatial awareness and coordination","Calm, fast decision-making under pressure","Technical precision and consistent accuracy","Physical and mental fitness"]},
+
+  { keys:["engineer","engineering","mechanical engineer","civil engineer","structural engineer","electrical engineer"],
+    emoji:"⚙️", field:"Engineering & Technology",
+    quote:"Engineers solve problems the world doesn't yet know it has.",
+    personality:["Analytical, logical and precise","Meticulous and highly systematic","Curious about how things work","Persistent and solution-focused"],
+    interests:["Mathematics, physics and applied science","Technology and machinery","Construction and structural systems","Innovation and problem-solving"],
+    like:["Solving technical problems from first principles","Seeing theoretical solutions become physical reality","Working with calculations, models and simulations","Collaborating in cross-disciplinary teams"],
+    need:["Strong mathematics and physics","Analytical and critical thinking","Computer-aided tools (CAD, simulation)","Project management and stakeholder communication"]},
+
+  { keys:["teacher","educator","lecturer","professor","tutor","instructor","schoolteacher"],
+    emoji:"📚", field:"Education & Teaching",
+    quote:"A great teacher changes a student's future — and sometimes their entire life.",
+    personality:["Patient, engaged and deeply enthusiastic","Empathetic and tuned in to others","Creative and inventive in teaching","Inspiring and naturally motivating"],
+    interests:["Learning science and pedagogy","Child and adolescent development","Deep expertise in your subject","Society and the future of education"],
+    like:["Watching students understand and grow","Explaining complex ideas in simple terms","Building genuine relationships with students","Planning varied and engaging lessons"],
+    need:["Clear communication and storytelling","Patience and strong empathy","Deep subject knowledge","Ability to motivate and inspire diverse learners"]},
+
+  { keys:["psychologist","psychology","clinical psychologist","therapist","counsellor","behavioural"],
+    emoji:"🧠", field:"Psychology & Behavioural Science",
+    quote:"Helping someone understand themselves better is one of the deepest gifts you can give.",
+    personality:["Deeply empathetic and an active listener","Analytically minded and scientifically rigorous","Patient and entirely non-judgmental","Profoundly curious about the human mind"],
+    interests:["Human behaviour, motivation and cognition","Psychology and neuroscience","Therapeutic approaches and evidence-based treatment","Academic research and theory development"],
+    like:["Understanding and supporting complex inner lives","Working methodically through long-term treatment","Identifying behavioural patterns and their roots","Combining scientific rigour with human warmth"],
+    need:["Deep empathy and attentive listening","Analytical and critical thinking","Scientific methodology and evidence-based practice","Strong professional ethics and appropriate distance"]},
+
+  { keys:["journalist","reporter","editor","news","correspondent","freelance journalist","media"],
+    emoji:"📰", field:"Media & Journalism",
+    quote:"Journalists give a voice to those who are not heard — and hold power to account.",
+    personality:["Relentlessly curious and investigative","Fast-thinking and highly stress-tolerant","Courageous in asking the difficult questions","Articulate and naturally persuasive"],
+    interests:["Politics, society and current affairs","Storytelling and the craft of writing","Source evaluation and fact-checking","Digital media, photography and video"],
+    like:["Digging into a story to find the truth","Interviewing and connecting with all kinds of people","Publishing under tight deadlines","Telling stories that genuinely matter"],
+    need:["Strong writing ability and narrative craft","Rigorous source criticism and fact verification","Quick, accurate and independent judgement","Full digital literacy and content production skills"]},
+
+  { keys:["electrician","plumber","tradesperson","carpenter","joiner","builder","construction","hvac","mechanic"],
+    emoji:"🔧", field:"Skilled Trades & Construction",
+    quote:"Tradespeople build and maintain the world that everyone else takes for granted.",
+    personality:["Highly practical and naturally hands-on","Resourceful and inventive problem-solver","Detail-conscious and quality-driven","Reliable, self-sufficient and responsible"],
+    interests:["Technical systems and mechanics","Construction and structural work","Electrical installations and circuitry","Physical, real-world problem-solving"],
+    like:["Seeing concrete and tangible results","Working at varied locations and sites each day","Solving practical on-the-spot problems","The independence of self-directed work"],
+    need:["Strong technical understanding and precision","Physical coordination and manual dexterity","Safety awareness and compliance","Clear client communication and reliability"]},
+
+  { keys:["graphic designer","designer","illustrator","art director","visual artist","brand designer"],
+    emoji:"🎨", field:"Graphic Design & Visual Communication",
+    quote:"Design is never just how something looks — it's about how it works and what it says.",
+    personality:["Visually attuned and highly aesthetic","Creative, original and full of ideas","Detail-focused and thoroughly precise","Open to feedback and comfortable with iteration"],
+    interests:["Typography, colour theory and layout","Brand identity and visual systems","Digital and print media production","Art history and contemporary visual culture"],
+    like:["Solving communication problems creatively","Building brands and visual identities from scratch","Watching abstract ideas become compelling visuals","Balancing aesthetics with clear functional purpose"],
+    need:["Proficiency in design tools (Figma, Adobe)","Strong compositional and colour sensitivity","Client communication and presentation skills","Iterative working mindset and a sharp critical eye"]},
+
+  { keys:["social worker","case worker","welfare","family support","community worker","youth worker"],
+    emoji:"🤝", field:"Social Work & Community Care",
+    quote:"Social workers are society's safety net — present when everything else has broken down.",
+    personality:["Deeply empathetic and endlessly patient","Resilient and emotionally robust","Committed to fairness and social justice","Non-judgmental and a careful listener"],
+    interests:["Social issues, inequality and human rights","Child and family welfare","Psychology and human behaviour","Legislation, policy and people's legal rights"],
+    like:["Making a concrete difference for vulnerable people","Building genuine trust with clients over time","Coordinating across multiple agencies and systems","Navigating and supporting complex life situations"],
+    need:["Empathy and significant emotional endurance","Knowledge of social care law and practice","Case documentation and professional reporting","Maintaining appropriate professional boundaries"]},
+
+  { keys:["accountant","finance","financial analyst","economist","auditor","controller","banking","investment"],
+    emoji:"💰", field:"Finance & Economics",
+    quote:"Behind every successful organisation is someone who makes sure the numbers tell the right story.",
+    personality:["Analytically sharp and highly logical","Meticulous with an eye for the finest detail","Reliable, trustworthy and deeply responsible","Structured, organised and systematic"],
+    interests:["Numbers, financial flows and data","Business development and strategy","Accounting principles and financial reporting","Investments, markets and economic trends"],
+    like:["Working with data, numbers and financial models","Creating clarity and order in complex financial flows","Providing insights that directly influence major decisions","Understanding and analysing how businesses truly work"],
+    need:["Strong mathematical and quantitative ability","Precision, accuracy and close attention to detail","Financial software and data analysis tools","Analytical and independent critical thinking"]},
+
+  { keys:["environmental scientist","ecologist","environmentalist","climate","sustainability","conservation"],
+    emoji:"🌿", field:"Environment & Sustainability",
+    quote:"Working on the climate is working for every future generation — no task is more urgent.",
+    personality:["Deeply passionate about the natural world","Scientifically rigorous and evidence-based","Patient with long-term, complex processes","Articulate and convincing communicator"],
+    interests:["Nature, ecology and biodiversity","Climate science and energy systems","Environmental law and policy","Data collection and environmental analysis"],
+    like:["Working outdoors and in the field","Analysing environmental data and long-term trends","Influencing policy and real-world decisions","Contributing meaningfully to a sustainable future"],
+    need:["Natural science knowledge and methodology","GIS, data analysis and modelling","Reporting, writing and communication skills","Long-term commitment and personal resilience"]},
+
+  { keys:["firefighter","fire service","rescue","fire fighter","fire officer","emergency services"],
+    emoji:"🚒", field:"Fire & Rescue Services",
+    quote:"Firefighters run towards danger when everyone else is running away — courage, training and teamwork.",
+    personality:["Courageous and immediately action-oriented","Calm and laser-focused in chaotic situations","An unwavering team player and loyal colleague","Physically strong, fit and highly resilient"],
+    interests:["Emergency response and life-saving rescue","Firefighting technology and equipment","Physical training and maintaining peak condition","Community protection and public safety"],
+    like:["Working in a tight-knit, high-trust team","Responding to acute and entirely unpredictable situations","Physical training as a core part of the job","Saving lives and protecting property and communities"],
+    need:["High levels of physical fitness and endurance","Calm head and fast decision-making under pressure","Effective teamwork and clear communication","Technical competence with specialist equipment"]},
+
+  { keys:["vet","veterinarian","veterinary","veterinary nurse","animal care","zoologist"],
+    emoji:"🐾", field:"Veterinary Medicine & Animal Care",
+    quote:"Animals can't tell you what's wrong — a vet must understand without words.",
+    personality:["A genuine animal lover with deep empathy","Analytically curious and scientifically rigorous","Patient and naturally dexterous","Empathetic towards anxious and worried owners"],
+    interests:["Animals and animal biology","Veterinary medicine and physiology","Natural sciences and ecology","Animal behaviour and ethology"],
+    like:["Working directly with animals every single day","Solving complex medical mysteries and diagnoses","Supporting concerned and distressed animal owners","Combining hands-on practical work with science"],
+    need:["Veterinary and biological knowledge","Manual dexterity and clinical precision","Emotional endurance for difficult outcomes","Clear, calm communication with animal owners"]},
+
+  { keys:["musician","artist","singer","composer","producer","songwriter","performer","music"],
+    emoji:"🎵", field:"Music & Performing Arts",
+    quote:"Music is the only language every human being understands — creating it is a gift and a calling.",
+    personality:["Deeply creative and emotionally expressive","Disciplined, dedicated and relentlessly committed","Emotionally reflective and self-aware","Courageous enough to share yourself with the world"],
+    interests:["Music across all forms and genres","Composition, arrangement and production","Live performance and stage presence","Music technology and recording"],
+    like:["Practising, creating and rehearsing daily","Performing live in front of audiences","Collaborating with fellow musicians and producers","Expressing the full range of human emotion through sound"],
+    need:["High technical musical skill on your instrument","Consistent self-discipline and dedicated practice","Emotional courage and authentic vulnerability","Business acumen and the ability to build a network"]}
+];
+
+/* ══════════════════════════════════════════
+   STATE & QUIZ LOGIC
+══════════════════════════════════════════ */
+let qIdx = 0, picked = null, scores = {};
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  el.classList.add('active');
+  el.style.animation = 'none'; el.offsetHeight; el.style.animation = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function startQuiz() {
+  qIdx = 0; scores = {}; picked = null;
+  renderQ(); showScreen('s-question');
+}
+
+function renderQ() {
+  const q = Qs[qIdx];
+  document.getElementById('qcat').textContent = q.cat;
+  document.getElementById('qtxt').textContent = q.txt;
+  document.getElementById('qimg').src = q.img;
+  document.getElementById('qstep').textContent = `Question ${qIdx + 1} of ${Qs.length}`;
+  const pct = Math.round(qIdx / Qs.length * 100);
+  document.getElementById('qb').style.width = pct + '%';
+  document.getElementById('qpct').textContent = pct + '%';
+
+  const grid = document.getElementById('qopts');
+  grid.innerHTML = '';
+  q.opts.forEach(o => {
+    const b = document.createElement('button');
+    b.className = 'opt';
+    b.innerHTML = `<span class="oe">${o.e}</span><div><div class="ol">${o.l}</div><div class="od">${o.d}</div></div>`;
+    b.onclick = () => {
+      picked = o.t;
+      document.querySelectorAll('.opt').forEach(x => x.classList.remove('sel'));
+      b.classList.add('sel');
+      document.getElementById('btn-next').classList.add('on');
+    };
+    grid.appendChild(b);
+  });
+  picked = null;
+  document.getElementById('btn-next').classList.remove('on');
+}
+
+function nextQ() {
+  if (!picked) return;
+  picked.forEach(tag => { scores[tag] = (scores[tag] || 0) + 1; });
+  qIdx++;
+  if (qIdx < Qs.length) renderQ();
+  else { showScreen('s-loading'); setTimeout(showResults, 2000); }
+}
+
+function showResults() {
+  const ranked = Careers.map(c => {
+    let s = 0; c.tags.forEach(tag => { if (scores[tag]) s += scores[tag]; }); return { ...c, s };
+  }).sort((a, b) => b.s - a.s);
+
+  const top3 = ranked.slice(0, 3);
+  const list = document.getElementById('clist');
+  list.innerHTML = '';
+  const labels = ['✦ Best Match', '✧ Strong Match', '◇ Great Alternative'];
+
+  top3.forEach((c, i) => {
+    const el = document.createElement('div');
+    el.className = 'cc';
+    el.innerHTML = `
+      <div class="cc-bar" style="background:${c.col}"></div>
+      <img class="cc-img" src="${c.img}" alt="${c.t}" loading="lazy">
+      <div class="cc-body">
+        <span class="cc-rank" style="background:${c.col}20;color:${c.col};border:1px solid ${c.col}40">${labels[i]}</span>
+        <div class="cc-title">${c.t}</div>
+        <div class="cc-desc">${c.desc}</div>
+        <div class="cc-stats">
+          <div class="cc-stat"><div class="cc-sv" style="color:${c.col}">${c.salary}</div><div class="cc-sl">Salary (approx.)</div></div>
+          <div class="cc-stat"><div class="cc-sv" style="color:${c.col}">${c.outlook}</div><div class="cc-sl">Job Market</div></div>
+        </div>
+      </div>`;
+    list.appendChild(el);
+  });
+
+  document.getElementById('ex-res').className = 'ex-res';
+  document.getElementById('ex-res').innerHTML = '';
+  document.getElementById('ex-in').value = '';
+  showScreen('s-results');
+}
+
+function restart() { showScreen('s-hero'); }
+
+/* ══════════════════════════════════════════
+   CAREER EXPLORER — instant, no API needed
+══════════════════════════════════════════ */
+function explore() {
+  const raw = document.getElementById('ex-in').value.trim().toLowerCase();
+  if (!raw) return;
+
+  const box = document.getElementById('ex-res');
+
+  const match = KB.find(entry =>
+    entry.keys.some(k => raw.includes(k) || k.includes(raw))
+  );
+
+  if (!match) {
+    box.innerHTML = `<p class="er-none">No results found for <strong>"${raw}"</strong>. Try a different spelling or a related profession — e.g. "nurse", "engineer", "teacher", "pilot".</p>`;
+    box.className = 'ex-res show';
+    return;
+  }
+
+  const ul = arr => `<ul>${arr.map(x => `<li>${x}</li>`).join('')}</ul>`;
+  const displayName = match.keys[0].split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
+  box.innerHTML = `
+    <div class="er-head">
+      <div class="er-emo">${match.emoji}</div>
+      <div>
+        <div class="er-name">${displayName}</div>
+        <div class="er-fld">${match.field}</div>
+      </div>
+    </div>
+    <p class="er-q">"${match.quote}"</p>
+    <div class="er-grid">
+      <div class="er-card">
+        <div class="er-ct" style="color:var(--a)">🧬 Personality Traits</div>
+        ${ul(match.personality)}
+      </div>
+      <div class="er-card">
+        <div class="er-ct" style="color:var(--b)">❤️ Interests That Fit</div>
+        ${ul(match.interests)}
+      </div>
+      <div class="er-card">
+        <div class="er-ct" style="color:var(--c)">☀️ You Should Enjoy</div>
+        ${ul(match.like)}
+      </div>
+      <div class="er-card">
+        <div class="er-ct" style="color:#ffd166">⚡ Key Skills Needed</div>
+        ${ul(match.need)}
+      </div>
+    </div>`;
+  box.className = 'ex-res show';
+  setTimeout(() => box.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+}
+</script>
+</body>
+</html>
