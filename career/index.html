@@ -1,0 +1,1837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FutureYou · Careers — A Diagnostic for Young People Choosing Their Path</title>
+<meta name="description" content="A fully online diagnostic that maps your personality and interests to the careers most aligned with who you are. Built for young people choosing their path.">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════════════
+   FUTUREYOU CAREERS — editorial system
+   Palette: warm cream + deep forest + charcoal
+════════════════════════════════════════════════════ */
+:root {
+  --cream:    #f5f0e6;
+  --paper:    #fbf8f1;
+  --ink:      #1a1d1a;
+  --ink-soft: #4a4d48;
+  --ink-mute: #8a8c87;
+  --rule:     #d8d0bf;
+  --accent:   #2d4a3e;       /* deep forest */
+  --accent-d: #1f3329;
+  --accent-l: #4a6b5d;
+  --gold:     #b8893d;       /* warm sienna for italic accents */
+  --error:    #a04545;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Subtle texture ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 20% 0%, rgba(45,74,62,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 90% 100%, rgba(184,137,61,0.05) 0%, transparent 60%);
+}
+
+/* ════ TOP BAR ════ */
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(245,240,230,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--rule);
+  padding: 12px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+@media (max-width: 640px) { .topbar { padding: 10px 18px; } }
+
+.brand { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+.brand-mark {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ink);
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--paper);
+  flex-shrink: 0;
+}
+/* inner ring */
+.brand-mark::before {
+  content:'';
+  position: absolute; inset: 3px;
+  border-radius: 50%;
+  border: 0.5px solid var(--accent);
+}
+/* small notch detail */
+.brand-mark::after {
+  content:'';
+  position: absolute;
+  bottom: 4px; left: 50%; transform: translateX(-50%);
+  width: 4px; height: 1px;
+  background: var(--ink);
+}
+.brand-mark span {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 17px;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  position: relative;
+  z-index: 1;
+}
+.brand-text {
+  display: flex; flex-direction: column;
+  line-height: 1.05;
+  gap: 2px;
+}
+.brand-name {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 19px;
+  color: var(--ink);
+  letter-spacing: -0.015em;
+}
+.brand-sector {
+  font-family: 'Inter', sans-serif;
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+@media (max-width: 540px) {
+  .brand-name { font-size: 17px; }
+  .brand-mark { width: 38px; height: 38px; }
+  .brand-mark span { font-size: 15px; }
+}
+
+.lang-switch { display: flex; gap: 4px; }
+.lang-btn {
+  font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
+  letter-spacing: 0.8px; text-transform: uppercase;
+  background: transparent; border: 1px solid transparent;
+  color: var(--ink-mute); padding: 6px 10px; border-radius: 100px;
+  cursor: pointer; transition: all 0.18s;
+}
+.lang-btn:hover  { color: var(--ink); }
+.lang-btn.active { color: var(--accent); border-color: var(--accent); }
+
+/* ════ APP CONTAINER ════ */
+#app {
+  position: relative; z-index: 1;
+  max-width: 760px; margin: 0 auto;
+  padding: 48px 32px 80px;
+}
+@media (max-width: 640px) { #app { padding: 32px 20px 60px; } }
+
+.screen { display: none; }
+.screen.active { display: block; animation: fadeUp 0.5s ease both; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ════ EDITORIAL ELEMENTS ════ */
+.eyebrow {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 22px;
+}
+
+.display-h {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(40px, 7vw, 64px);
+  font-weight: 500; line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin-bottom: 24px;
+}
+.display-h em { font-style: italic; font-weight: 500; color: var(--accent); }
+
+.subhead {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(24px, 4vw, 34px);
+  font-weight: 500; line-height: 1.2;
+  letter-spacing: -0.01em;
+  margin-bottom: 18px;
+}
+.subhead em { font-style: italic; color: var(--accent); }
+
+.lead {
+  font-size: 17px; font-weight: 400; line-height: 1.65;
+  color: var(--ink-soft);
+  max-width: 540px;
+}
+
+/* ════ HERO ════ */
+.hero { padding: 24px 0 48px; }
+.hero-meta {
+  display: flex; flex-wrap: wrap; gap: 24px;
+  margin-top: 32px; padding-top: 24px;
+  border-top: 1px solid var(--rule);
+}
+.hero-meta-item {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--ink-mute);
+}
+.hero-meta-item::before {
+  content: ''; width: 5px; height: 5px;
+  border-radius: 50%; background: var(--accent);
+}
+
+.cta-row { display: flex; gap: 14px; margin-top: 36px; flex-wrap: wrap; }
+
+/* ── HERO IMAGE COLLAGE ── */
+.hero-collage {
+  margin-top: 48px;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  grid-template-rows: 180px 140px;
+  gap: 14px;
+  position: relative;
+}
+@media (max-width: 720px) {
+  .hero-collage {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 160px 120px 120px;
+  }
+}
+@media (max-width: 460px) {
+  .hero-collage {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(3, 150px);
+  }
+}
+.collage-tile {
+  position: relative;
+  overflow: hidden;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+}
+.collage-tile img {
+  width: 100%; height: 100%; object-fit: cover;
+  filter: grayscale(15%) contrast(1.02) saturate(0.92);
+  transition: transform 0.6s ease, filter 0.4s ease;
+}
+.collage-tile:hover img { transform: scale(1.04); filter: grayscale(0%) contrast(1.05) saturate(1); }
+.collage-tile-1 { grid-column: 1 / 2; grid-row: 1 / 3; }
+.collage-tile-2 { grid-column: 2 / 3; grid-row: 1 / 2; }
+.collage-tile-3 { grid-column: 3 / 4; grid-row: 1 / 2; }
+.collage-tile-4 { grid-column: 2 / 4; grid-row: 2 / 3; }
+@media (max-width: 720px) {
+  .collage-tile-1 { grid-column: 1 / 3; grid-row: 1 / 2; }
+  .collage-tile-2 { grid-column: 1 / 2; grid-row: 2 / 3; }
+  .collage-tile-3 { grid-column: 2 / 3; grid-row: 2 / 3; }
+  .collage-tile-4 { grid-column: 1 / 3; grid-row: 3 / 4; }
+}
+@media (max-width: 460px) {
+  .collage-tile { grid-column: 1 / 2 !important; }
+  .collage-tile-1 { grid-row: 1 / 2; }
+  .collage-tile-2 { grid-row: 2 / 3; }
+  .collage-tile-3 { display: none; }
+  .collage-tile-4 { grid-row: 3 / 4; }
+}
+.collage-caption {
+  position: absolute; bottom: 10px; left: 12px;
+  font-family: 'Fraunces', serif; font-style: italic;
+  font-size: 13px; color: var(--cream);
+  letter-spacing: 0.2px;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.7);
+}
+
+.btn-primary {
+  font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px;
+  letter-spacing: 0.3px;
+  background: var(--accent); color: var(--cream);
+  border: none; padding: 15px 28px; border-radius: 2px;
+  cursor: pointer; transition: background 0.18s, transform 0.18s;
+}
+.btn-primary:hover { background: var(--accent-d); transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+.btn-secondary {
+  font-family: 'Inter', sans-serif; font-weight: 500; font-size: 14px;
+  background: transparent; color: var(--ink);
+  border: 1px solid var(--ink); padding: 14px 26px; border-radius: 2px;
+  cursor: pointer; transition: all 0.18s;
+}
+.btn-secondary:hover { background: var(--ink); color: var(--cream); }
+
+/* ════ METHOD STRIP (hero secondary section) ════ */
+.method-strip {
+  margin-top: 56px; padding-top: 40px;
+  border-top: 1px solid var(--rule);
+}
+.method-strip-title {
+  font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--ink-mute); margin-bottom: 24px;
+}
+.method-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;
+}
+@media (max-width: 640px) { .method-grid { grid-template-columns: 1fr; gap: 22px; } }
+.method-item { padding-right: 16px; }
+.method-num {
+  font-family: 'Fraunces', serif; font-size: 13px; font-weight: 500;
+  color: var(--accent); letter-spacing: 1px; margin-bottom: 8px;
+}
+.method-h {
+  font-family: 'Fraunces', serif; font-size: 18px; font-weight: 600;
+  margin-bottom: 6px; color: var(--ink);
+}
+.method-p { font-size: 14px; color: var(--ink-soft); line-height: 1.55; }
+
+/* ════ COUNTRY SELECTOR ════ */
+.country-block {
+  margin: 36px 0 40px;
+  padding: 28px 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+.country-label {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--ink-mute);
+  margin-bottom: 12px;
+}
+.country-select {
+  width: 100%;
+  max-width: 460px;
+  background: var(--paper);
+  border: 1px solid var(--ink-mute);
+  padding: 14px 18px;
+  font-family: 'Fraunces', serif;
+  font-size: 18px; font-weight: 500;
+  color: var(--ink);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%232d4a3e' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 18px center;
+  background-size: 12px 8px;
+  padding-right: 44px;
+  transition: border-color 0.18s;
+}
+.country-select:focus { border-color: var(--accent); }
+.country-select:hover { border-color: var(--accent); }
+.country-note {
+  font-size: 13px;
+  color: var(--ink-mute);
+  line-height: 1.6;
+  margin-top: 14px;
+  max-width: 520px;
+  font-style: italic;
+  font-family: 'Fraunces', serif;
+}
+
+/* ════ QUESTION ════ */
+.q-meta {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 36px; padding-bottom: 18px;
+  border-bottom: 1px solid var(--rule);
+}
+.q-step {
+  font-family: 'Fraunces', serif; font-size: 13px; font-weight: 500;
+  color: var(--accent); letter-spacing: 0.5px;
+}
+.q-step em { font-style: italic; color: var(--ink-mute); }
+.q-progress-track {
+  flex: 1; margin: 0 24px; height: 1px; background: var(--rule); overflow: hidden;
+}
+.q-progress-fill {
+  height: 100%; background: var(--accent); transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+.q-pct { font-size: 12px; color: var(--ink-mute); font-variant-numeric: tabular-nums; }
+
+.q-domain {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 14px;
+}
+
+.q-prompt {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(26px, 4.5vw, 38px);
+  font-weight: 500; line-height: 1.2;
+  letter-spacing: -0.015em;
+  margin-bottom: 32px;
+  color: var(--ink);
+}
+
+.q-options {
+  display: flex; flex-direction: column;
+  gap: 0;
+  border-top: 1px solid var(--rule);
+}
+
+.q-opt {
+  display: flex; align-items: flex-start; gap: 16px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--rule);
+  cursor: pointer;
+  background: transparent; border-left: none; border-right: none; border-top: none;
+  text-align: left;
+  font-family: 'Inter', sans-serif;
+  width: 100%;
+  transition: padding 0.18s;
+}
+.q-opt:hover { padding-left: 12px; }
+.q-opt.sel   { padding-left: 12px; }
+.q-opt-marker {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 1.5px solid var(--ink-mute);
+  flex-shrink: 0; margin-top: 2px;
+  position: relative;
+  transition: all 0.2s;
+}
+.q-opt.sel .q-opt-marker {
+  border-color: var(--accent); background: var(--accent);
+}
+.q-opt.sel .q-opt-marker::after {
+  content: ''; position: absolute;
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 8px; height: 8px; border-radius: 50%; background: var(--cream);
+}
+.q-opt-body { flex: 1; }
+.q-opt-label {
+  font-size: 16px; font-weight: 500; color: var(--ink);
+  line-height: 1.4; margin-bottom: 3px;
+}
+.q-opt-desc { font-size: 13px; color: var(--ink-mute); line-height: 1.5; }
+
+.q-actions {
+  margin-top: 36px; display: flex; justify-content: space-between; align-items: center;
+}
+.q-back {
+  background: transparent; border: none; cursor: pointer;
+  font-family: 'Inter', sans-serif; font-size: 13px; color: var(--ink-mute);
+  display: flex; align-items: center; gap: 6px;
+}
+.q-back:hover { color: var(--ink); }
+.q-back:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* ════ LOADING ════ */
+.loading-block {
+  padding: 80px 0; text-align: center;
+}
+.loading-h {
+  font-family: 'Fraunces', serif;
+  font-size: 28px; font-weight: 500; font-style: italic;
+  color: var(--ink); margin-bottom: 28px;
+}
+.loading-line {
+  width: 60px; height: 1px; background: var(--rule);
+  margin: 0 auto; position: relative; overflow: hidden;
+}
+.loading-line::after {
+  content: ''; position: absolute; top: 0; left: -60px;
+  width: 60px; height: 1px; background: var(--accent);
+  animation: slide 1.4s ease-in-out infinite;
+}
+@keyframes slide {
+  0%   { left: -60px; }
+  50%  { left: 60px; }
+  100% { left: -60px; }
+}
+
+/* ════ RESULTS ════ */
+.results-hero { margin-bottom: 56px; }
+
+.section-h {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--ink-mute);
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.career-list { display: flex; flex-direction: column; }
+
+.career {
+  padding: 32px 0;
+  border-bottom: 1px solid var(--rule);
+  animation: fadeUp 0.5s ease both;
+}
+.career:nth-child(2) { animation-delay: 0.08s; }
+.career:nth-child(3) { animation-delay: 0.16s; }
+
+.career-num {
+  font-family: 'Fraunces', serif;
+  font-size: 13px; font-weight: 500;
+  color: var(--accent); letter-spacing: 1.5px;
+  margin-bottom: 12px;
+  display: flex; align-items: baseline; gap: 14px;
+}
+.career-num em { font-style: italic; color: var(--ink-mute); }
+
+.career-row {
+  display: grid; grid-template-columns: 180px 1fr 180px; gap: 28px;
+  align-items: start;
+}
+@media (max-width: 760px) {
+  .career-row { grid-template-columns: 140px 1fr; gap: 20px; }
+  .career-stats-col { grid-column: 1 / 3; margin-top: 10px; }
+}
+@media (max-width: 500px) {
+  .career-row { grid-template-columns: 1fr; gap: 16px; }
+  .career-stats-col { grid-column: 1; }
+}
+
+.career-image-wrap {
+  width: 100%; aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+}
+.career-image {
+  width: 100%; height: 100%; object-fit: cover;
+  filter: grayscale(20%) contrast(1.02) saturate(0.9);
+}
+@media (max-width: 500px) {
+  .career-image-wrap { aspect-ratio: 16 / 9; }
+}
+
+.career-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(24px, 3.5vw, 30px);
+  font-weight: 500; line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+
+.career-desc {
+  font-size: 15px; color: var(--ink-soft); line-height: 1.65;
+  margin-bottom: 18px;
+}
+
+.career-stats {
+  display: flex; flex-direction: column; gap: 14px;
+  border-left: 1px solid var(--rule);
+  padding-left: 20px;
+}
+@media (max-width: 760px) {
+  .career-stats { flex-direction: row; flex-wrap: wrap;
+    border-left: none; border-top: 1px solid var(--rule);
+    padding-left: 0; padding-top: 14px; }
+}
+.stat-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--ink-mute); margin-bottom: 4px;
+}
+.stat-val {
+  font-family: 'Fraunces', serif;
+  font-size: 16px; font-weight: 500; color: var(--ink);
+  line-height: 1.2;
+}
+@media (max-width: 760px) { .career-stats > div { min-width: 140px; } }
+
+/* ════ EXPLORER ════ */
+.explorer {
+  margin-top: 64px;
+  padding: 36px;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+}
+@media (max-width: 600px) { .explorer { padding: 26px 22px; } }
+
+.explorer-num {
+  font-family: 'Fraunces', serif; font-size: 13px; font-weight: 500;
+  color: var(--accent); letter-spacing: 1.5px; margin-bottom: 10px;
+}
+.explorer-h {
+  font-family: 'Fraunces', serif;
+  font-size: 26px; font-weight: 500; line-height: 1.2;
+  letter-spacing: -0.01em; color: var(--ink);
+  margin-bottom: 10px;
+}
+.explorer-h em { font-style: italic; color: var(--accent); }
+.explorer-p { font-size: 14px; color: var(--ink-soft); line-height: 1.6; margin-bottom: 22px; max-width: 520px; }
+
+.explorer-form { display: flex; gap: 10px; flex-wrap: wrap; }
+.explorer-input {
+  flex: 1; min-width: 220px;
+  background: var(--cream);
+  border: 1px solid var(--ink-mute);
+  padding: 13px 16px;
+  font-family: 'Inter', sans-serif; font-size: 14px;
+  color: var(--ink);
+  border-radius: 2px;
+  outline: none;
+  transition: border-color 0.18s;
+}
+.explorer-input:focus { border-color: var(--accent); }
+.explorer-input::placeholder { color: var(--ink-mute); }
+
+/* ════ EXPLORER RESULT ════ */
+.er-result { display: none; margin-top: 32px; padding-top: 28px; border-top: 1px solid var(--rule); }
+.er-result.show { display: block; animation: fadeUp 0.4s ease both; }
+
+.er-header {
+  display: flex; align-items: baseline; gap: 14px;
+  margin-bottom: 8px;
+}
+.er-icon { font-size: 24px; }
+.er-name {
+  font-family: 'Fraunces', serif; font-size: 24px; font-weight: 500;
+  letter-spacing: -0.01em; color: var(--ink);
+}
+.er-field { font-size: 12px; color: var(--ink-mute); margin-bottom: 18px; letter-spacing: 0.3px; }
+.er-quote {
+  font-family: 'Fraunces', serif; font-style: italic;
+  font-size: 17px; font-weight: 400; line-height: 1.45;
+  color: var(--accent);
+  margin: 18px 0 28px;
+  padding-left: 16px;
+  border-left: 2px solid var(--accent);
+}
+
+.er-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 28px 36px;
+}
+@media (max-width: 540px) { .er-grid { grid-template-columns: 1fr; gap: 24px; } }
+
+.er-section-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--rule);
+}
+.er-section ul { list-style: none; padding: 0; }
+.er-section li {
+  font-size: 14px; color: var(--ink-soft); line-height: 1.6;
+  padding: 5px 0;
+}
+
+.er-none {
+  font-size: 14px; color: var(--ink-soft); line-height: 1.65;
+  font-style: italic;
+  padding: 8px 0;
+}
+
+/* ════ FOOTER ════ */
+.footer {
+  margin-top: 80px; padding-top: 36px;
+  border-top: 1px solid var(--rule);
+  display: flex; justify-content: space-between; align-items: baseline;
+  flex-wrap: wrap; gap: 16px;
+}
+.footer-text {
+  font-size: 12px; color: var(--ink-mute); line-height: 1.7;
+}
+.footer-text em { font-family: 'Fraunces', serif; font-style: italic; color: var(--ink-soft); }
+
+.restart-link {
+  font-family: 'Inter', sans-serif; font-size: 13px;
+  background: transparent; border: none;
+  color: var(--ink-mute); cursor: pointer;
+  letter-spacing: 0.3px;
+  border-bottom: 1px solid var(--rule);
+  padding: 2px 0;
+  transition: color 0.18s, border-color 0.18s;
+}
+.restart-link:hover { color: var(--ink); border-color: var(--ink); }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <a href="/" class="brand" style="text-decoration:none; color:inherit;" aria-label="Back to FutureYou Consulting">
+    <div class="brand-mark"><span>FY</span></div>
+    <div class="brand-text">
+      <span class="brand-name">FutureYou</span>
+      <span class="brand-sector" id="brand-sector">Careers</span>
+    </div>
+  </a>
+  <div class="lang-switch">
+    <button class="lang-btn active" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" onclick="setLang('sv')">SV</button>
+    <button class="lang-btn" onclick="setLang('es')">ES</button>
+  </div>
+</div>
+
+<div id="app">
+
+<!-- ════ HERO ════ -->
+<section class="screen active" id="s-hero">
+  <div class="hero">
+    <div class="eyebrow" id="hero-eyebrow"></div>
+    <h1 class="display-h" id="hero-title"></h1>
+    <p class="lead" id="hero-lead"></p>
+
+    <div class="cta-row">
+      <button class="btn-primary" onclick="startQuiz()" id="hero-cta"></button>
+      <button class="btn-secondary" onclick="scrollToMethod()" id="hero-cta2"></button>
+    </div>
+
+    <div class="hero-meta">
+      <span class="hero-meta-item" id="hero-meta-1"></span>
+      <span class="hero-meta-item" id="hero-meta-2"></span>
+      <span class="hero-meta-item" id="hero-meta-3"></span>
+    </div>
+
+    <!-- Hero image collage -->
+    <div class="hero-collage">
+      <div class="collage-tile collage-tile-1">
+        <img src="https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=800&q=80" alt="Architect at work">
+        <span class="collage-caption" id="cap-1"></span>
+      </div>
+      <div class="collage-tile collage-tile-2">
+        <img src="https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=600&q=80" alt="Nurse in hospital">
+        <span class="collage-caption" id="cap-2"></span>
+      </div>
+      <div class="collage-tile collage-tile-3">
+        <img src="https://images.unsplash.com/photo-1581092335397-9583eb92d232?w=600&q=80" alt="Engineer">
+        <span class="collage-caption" id="cap-3"></span>
+      </div>
+      <div class="collage-tile collage-tile-4">
+        <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&q=80" alt="Designer team">
+        <span class="collage-caption" id="cap-4"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="method-strip" id="method-strip">
+    <div class="method-strip-title" id="method-title"></div>
+    <div class="method-grid">
+      <div class="method-item">
+        <div class="method-num">01</div>
+        <h3 class="method-h" id="method-1-h"></h3>
+        <p class="method-p" id="method-1-p"></p>
+      </div>
+      <div class="method-item">
+        <div class="method-num">02</div>
+        <h3 class="method-h" id="method-2-h"></h3>
+        <p class="method-p" id="method-2-p"></p>
+      </div>
+      <div class="method-item">
+        <div class="method-num">03</div>
+        <h3 class="method-h" id="method-3-h"></h3>
+        <p class="method-p" id="method-3-p"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ COUNTRY ════ -->
+<section class="screen" id="s-country">
+  <div class="eyebrow" id="country-eyebrow"></div>
+  <h2 class="display-h" id="country-title"></h2>
+  <p class="lead" id="country-lead"></p>
+
+  <div class="country-block">
+    <label class="country-label" for="country-select" id="country-label-text"></label>
+    <select class="country-select" id="country-select" onchange="onCountryChange()"></select>
+    <p class="country-note" id="country-note"></p>
+  </div>
+
+  <div class="q-actions">
+    <button class="q-back" onclick="restart()">← <span id="country-back"></span></button>
+    <button class="btn-primary" onclick="confirmCountry()" id="country-cta"></button>
+  </div>
+</section>
+
+<!-- ════ QUESTION ════ -->
+<section class="screen" id="s-question">
+  <div class="q-meta">
+    <span class="q-step" id="q-step"></span>
+    <div class="q-progress-track"><div class="q-progress-fill" id="q-progress" style="width:0%"></div></div>
+    <span class="q-pct" id="q-pct">0%</span>
+  </div>
+
+  <div class="q-domain" id="q-domain"></div>
+  <h2 class="q-prompt" id="q-prompt"></h2>
+  <div class="q-options" id="q-options"></div>
+
+  <div class="q-actions">
+    <button class="q-back" id="q-back" onclick="prevQ()">← <span id="back-label"></span></button>
+    <button class="btn-primary" id="q-next" onclick="nextQ()" disabled></button>
+  </div>
+</section>
+
+<!-- ════ LOADING ════ -->
+<section class="screen" id="s-loading">
+  <div class="loading-block">
+    <h2 class="loading-h" id="loading-h"></h2>
+    <div class="loading-line"></div>
+  </div>
+</section>
+
+<!-- ════ RESULTS ════ -->
+<section class="screen" id="s-results">
+  <div class="results-hero">
+    <div class="eyebrow" id="res-eyebrow"></div>
+    <h1 class="display-h" id="res-title"></h1>
+    <p class="lead" id="res-lead"></p>
+  </div>
+
+  <div class="section-h" id="section-matches"></div>
+  <div class="career-list" id="career-list"></div>
+
+  <div class="explorer">
+    <div class="explorer-num">04 — <span id="explorer-num-label"></span></div>
+    <h2 class="explorer-h" id="explorer-h"></h2>
+    <p class="explorer-p" id="explorer-p"></p>
+    <div class="explorer-form">
+      <input class="explorer-input" id="ex-input" type="text" maxlength="60"
+        onkeydown="if(event.key==='Enter') explore()">
+      <button class="btn-primary" onclick="explore()" id="ex-btn"></button>
+    </div>
+    <div class="er-result" id="ex-result"></div>
+  </div>
+
+  <div class="footer">
+    <p class="footer-text" id="footer-text"></p>
+    <button class="restart-link" onclick="restart()" id="restart-btn"></button>
+  </div>
+</section>
+
+</div><!-- /#app -->
+
+<script>
+/* ════════════════════════════════════════════════════
+   UI TEXT  (per language)
+════════════════════════════════════════════════════ */
+const UI = {
+  en: {
+    eyebrow:      "For young people choosing their path",
+    title:        "Who are you, <em>really.</em> And what work fits that.",
+    lead:         "A fully online diagnostic that maps your personality and interests to the careers most aligned with who you are. About ten minutes. No essays. No homework. The result is a ranked shortlist and a way to keep exploring.",
+    cta:          "Begin the Diagnostic",
+    cta2:         "See how it works",
+    meta1:        "Fully online — start anytime",
+    meta2:        "13 questions, ten minutes",
+    meta3:        "Free to take, yours to keep",
+    cap1:         "An architect at her drawing board.",
+    cap2:         "A nurse, mid-shift.",
+    cap3:         "An engineer on site.",
+    cap4:         "A design studio at work.",
+    countryEyebrow: "Step one of two",
+    countryTitle:   "First, <em>where will you work?</em>",
+    countryLead:    "Salaries differ dramatically by country. Tell us where you plan to build your career so the diagnostic shows you ranges that actually reflect your local market.",
+    countryLabel:   "Country of work",
+    countryNote:    "You can change this at any time. Estimates are typical gross monthly salaries for early- to mid-career professionals.",
+    countryCta:     "Continue to questions →",
+    countryBack:    "Back to start",
+    methodTitle:  "The Method",
+    method1H:     "Honest answers",
+    method1P:     "Thirteen questions across personality, interests, work style and what genuinely moves you. Pick the option that feels truest.",
+    method2H:     "Ranked diagnosis",
+    method2P:     "We map your answers across more than sixty professions and surface the three most aligned with who you are — not the loudest careers, the right ones.",
+    method3H:     "Keep exploring",
+    method3P:     "Once you see your matches, type any profession into the explorer and we'll show you the personality, interests and skills the role actually rewards.",
+    questionOf:   (n,t) => `Question <em>${n}</em> of ${t}`,
+    continueBtn:  "Continue →",
+    backLabel:    "Back",
+    loadingH:     "Reading your answers.",
+    resEyebrow:   "Your Diagnosis",
+    resTitle:     "Three paths, <em>ranked.</em>",
+    resLead:      "Across the personalities, interests and motivations you described, these are the careers most aligned with who you are. Not the only options — the strongest signals.",
+    sectionMatches: "The matches",
+    salaryLabel:  "Salary range",
+    jobLabel:     "Job market",
+    explorerNum:  "Keep exploring",
+    explorerH:    "Curious about a different profession? <em>Look it up.</em>",
+    explorerP:    "Type any role — police officer, nurse, chef, architect — and you'll see the personality, interests, day-to-day enjoyment and key skills the role rewards.",
+    exPlaceholder:"e.g. Police officer, Nurse, Chef, Engineer",
+    exBtn:        "Look it up →",
+    erPersonality:"Personality",
+    erInterests:  "Interests that fit",
+    erLike:       "You should enjoy",
+    erNeed:       "Key skills",
+    erNone:       q => `No entry found for <em>"${q}"</em>. Try a different spelling or a related profession — e.g. nurse, engineer, teacher, pilot.`,
+    footerText:   `<em>FutureYou · Careers.</em> A diagnostic for the people choosing where to go next.`,
+    restart:      "Start over",
+  },
+  sv: {
+    eyebrow:      "För unga som väljer sin väg",
+    title:        "Vem är du, <em>egentligen.</em> Och vilket arbete passar det.",
+    lead:         "En helt online-baserad diagnostik som matchar din personlighet och dina intressen mot de yrken som är mest anpassade efter vem du är. Tar runt tio minuter. Inga essäer. Inga hemläxor. Resultatet är en rankad kortlista — och ett sätt att fortsätta utforska.",
+    cta:          "Starta diagnostiken",
+    cta2:         "Se hur det fungerar",
+    meta1:        "Helt online — börja när du vill",
+    meta2:        "13 frågor, tio minuter",
+    meta3:        "Gratis att göra, din att behålla",
+    cap1:         "En arkitekt vid sitt ritbord.",
+    cap2:         "En sjuksköterska, mitt i passet.",
+    cap3:         "En ingenjör på plats.",
+    cap4:         "En designstudio i arbete.",
+    countryEyebrow: "Steg ett av två",
+    countryTitle:   "Först, <em>var ska du jobba?</em>",
+    countryLead:    "Löner skiljer sig dramatiskt mellan länder. Berätta var du planerar att bygga din karriär så visar diagnostiken intervall som faktiskt speglar din lokala marknad.",
+    countryLabel:   "Arbetsland",
+    countryNote:    "Du kan ändra detta när som helst. Uppskattningarna är typiska bruttolöner per månad för personer i tidig till mellan karriär.",
+    countryCta:     "Fortsätt till frågorna →",
+    countryBack:    "Tillbaka till start",
+    methodTitle:  "Metoden",
+    method1H:     "Ärliga svar",
+    method1P:     "Tretton frågor om personlighet, intressen, arbetsstil och vad som verkligen driver dig. Välj det alternativ som känns sannast.",
+    method2H:     "Rankad diagnos",
+    method2P:     "Vi matchar dina svar mot över sextio yrken och tar fram de tre som passar dig bäst — inte de mest hypade, de rätta.",
+    method3H:     "Fortsätt utforska",
+    method3P:     "När du sett dina matchningar kan du skriva in vilket yrke som helst i sökrutan och få veta vilken personlighet, vilka intressen och vilka kompetenser yrket faktiskt belönar.",
+    questionOf:   (n,t) => `Fråga <em>${n}</em> av ${t}`,
+    continueBtn:  "Fortsätt →",
+    backLabel:    "Tillbaka",
+    loadingH:     "Läser dina svar.",
+    resEyebrow:   "Din diagnos",
+    resTitle:     "Tre vägar, <em>rankade.</em>",
+    resLead:      "Givet din personlighet, dina intressen och de drivkrafter du beskrev, är detta de yrken som passar dig bäst. Inte de enda alternativen — utan de starkaste signalerna.",
+    sectionMatches: "Matchningarna",
+    salaryLabel:  "Lönenivå",
+    jobLabel:     "Jobbmarknad",
+    explorerNum:  "Fortsätt utforska",
+    explorerH:    "Nyfiken på ett annat yrke? <em>Slå upp det.</em>",
+    explorerP:    "Skriv in vilken roll som helst — polis, sjuksköterska, kock, arkitekt — och du får se vilken personlighet, vilka intressen, vad du ska tycka om i vardagen och vilka nyckelkompetenser yrket belönar.",
+    exPlaceholder:"T.ex. Polis, Sjuksköterska, Kock, Ingenjör",
+    exBtn:        "Slå upp →",
+    erPersonality:"Personlighet",
+    erInterests:  "Intressen som passar",
+    erLike:       "Du bör tycka om",
+    erNeed:       "Nyckelkompetenser",
+    erNone:       q => `Hittade ingen post för <em>"${q}"</em>. Prova en annan stavning eller ett relaterat yrke — t.ex. läkare, ingenjör, lärare, pilot.`,
+    footerText:   `<em>FutureYou · Careers.</em> En diagnostik för dem som väljer var de ska gå härnäst.`,
+    restart:      "Börja om",
+  },
+  es: {
+    eyebrow:      "Para jóvenes que eligen su camino",
+    title:        "Quién eres, <em>de verdad.</em> Y qué trabajo encaja con eso.",
+    lead:         "Un diagnóstico totalmente online que asigna tu personalidad e intereses a las carreras más alineadas con quien eres. Unos diez minutos. Sin ensayos. Sin deberes. El resultado es una lista corta clasificada — y una forma de seguir explorando.",
+    cta:          "Empezar el diagnóstico",
+    cta2:         "Ver cómo funciona",
+    meta1:        "Totalmente online — empieza cuando quieras",
+    meta2:        "13 preguntas, diez minutos",
+    meta3:        "Gratis, tuyo para siempre",
+    cap1:         "Una arquitecta en su mesa de dibujo.",
+    cap2:         "Una enfermera, en pleno turno.",
+    cap3:         "Un ingeniero sobre el terreno.",
+    cap4:         "Un estudio de diseño en acción.",
+    countryEyebrow: "Paso uno de dos",
+    countryTitle:   "Primero, <em>¿dónde vas a trabajar?</em>",
+    countryLead:    "Los salarios varían dramáticamente según el país. Cuéntanos dónde planeas construir tu carrera para que el diagnóstico muestre rangos que reflejen realmente tu mercado local.",
+    countryLabel:   "País de trabajo",
+    countryNote:    "Puedes cambiarlo en cualquier momento. Las estimaciones son salarios brutos mensuales típicos para profesionales de carrera temprana a media.",
+    countryCta:     "Continuar a las preguntas →",
+    countryBack:    "Volver al inicio",
+    methodTitle:  "El método",
+    method1H:     "Respuestas honestas",
+    method1P:     "Trece preguntas sobre personalidad, intereses, estilo de trabajo y lo que realmente te mueve. Elige la opción que más resuene contigo.",
+    method2H:     "Diagnóstico clasificado",
+    method2P:     "Mapeamos tus respuestas en más de sesenta profesiones y mostramos las tres más alineadas con quien eres — no las más populares, sino las acertadas.",
+    method3H:     "Sigue explorando",
+    method3P:     "Una vez veas tus coincidencias, escribe cualquier profesión en el buscador y verás la personalidad, los intereses y las habilidades que el rol realmente recompensa.",
+    questionOf:   (n,t) => `Pregunta <em>${n}</em> de ${t}`,
+    continueBtn:  "Continuar →",
+    backLabel:    "Atrás",
+    loadingH:     "Leyendo tus respuestas.",
+    resEyebrow:   "Tu diagnóstico",
+    resTitle:     "Tres caminos, <em>clasificados.</em>",
+    resLead:      "Según las personalidades, intereses y motivaciones que describiste, estas son las carreras más alineadas contigo. No las únicas opciones — las señales más fuertes.",
+    sectionMatches: "Las coincidencias",
+    salaryLabel:  "Rango salarial",
+    jobLabel:     "Mercado laboral",
+    explorerNum:  "Sigue explorando",
+    explorerH:    "¿Curiosidad por otra profesión? <em>Búscala.</em>",
+    explorerP:    "Escribe cualquier rol — policía, enfermero, chef, arquitecto — y verás la personalidad, los intereses, lo que debes disfrutar día a día y las habilidades clave que la profesión recompensa.",
+    exPlaceholder:"Ej. Policía, Enfermero, Chef, Ingeniero",
+    exBtn:        "Buscar →",
+    erPersonality:"Personalidad",
+    erInterests:  "Intereses que encajan",
+    erLike:       "Debes disfrutar",
+    erNeed:       "Habilidades clave",
+    erNone:       q => `No se encontró entrada para <em>"${q}"</em>. Prueba con otra ortografía o una profesión relacionada — ej. enfermero, ingeniero, maestro, piloto.`,
+    footerText:   `<em>FutureYou · Careers.</em> Un diagnóstico para quienes eligen a dónde ir después.`,
+    restart:      "Empezar de nuevo",
+  }
+};
+
+/* ════════════════════════════════════════════════════
+   QUESTIONS  (full 13 across 3 languages)
+════════════════════════════════════════════════════ */
+const Qs = {
+en:[
+  {cat:"How you think",txt:"When you face a difficult problem, what's your first instinct?",opts:[
+    {l:"Analyse the facts and numbers",d:"Break it down logically, step by step",t:["analytical","data","STEM","technical"]},
+    {l:"Sketch or visualise it",d:"Draw it out and make it concrete",t:["creative","visual","design","art"]},
+    {l:"Talk it through with others",d:"Collaboration sparks the best ideas",t:["social","leadership","communication","teamwork"]},
+    {l:"Experiment until it works",d:"Try, fail, learn and try again",t:["science","research","hands-on","practical"]}]},
+  {cat:"Your motivation",txt:"What kind of impact do you most want to have on the world?",opts:[
+    {l:"Protect people and keep them safe",d:"Safety, justice and emergency response",t:["safety","protective","police","emergency","justice","law"]},
+    {l:"Improve people's health",d:"Help people live better and longer lives",t:["health","medicine","care","nursing","medical"]},
+    {l:"Advance technology and science",d:"Build tomorrow's tools and solutions",t:["technology","AI","engineering","digital","science"]},
+    {l:"Create a fairer society",d:"Education, law and reducing inequality",t:["social","policy","law","education","justice","service"]}]},
+  {cat:"Work environment",txt:"Which work setting feels most like you?",opts:[
+    {l:"Flexible — remote or varied locations",d:"Freedom to choose where and when I work",t:["remote","digital","independent","creative","flexible"]},
+    {l:"A busy office, clinic or studio",d:"The energy of a team around me every day",t:["collaborative","office","business","teamwork"]},
+    {l:"Outdoors, on-site or on the move",d:"Variety, movement and the real world",t:["hands-on","outdoor","physical","active","fieldwork","trade"]},
+    {l:"Lab, classroom or focused workspace",d:"Deep concentration and quiet, focused work",t:["science","research","focused","medical","laboratory","teaching"]}]},
+  {cat:"Favourite subjects",txt:"Which subjects did you enjoy most at school?",opts:[
+    {l:"Maths and science",d:"Numbers, formulas and discoveries",t:["STEM","analytical","engineering","data","technical"]},
+    {l:"Art, music and design",d:"Expressing ideas creatively and visually",t:["creative","design","art","media","music","crafts"]},
+    {l:"Languages and literature",d:"Writing, stories and communication",t:["communication","writing","social","law","languages","journalism"]},
+    {l:"Biology and the environment",d:"Living things, health and the natural world",t:["science","environment","health","biology","medical","nature"]}]},
+  {cat:"What you value",txt:"What matters most to you in a future career?",opts:[
+    {l:"Good pay and financial security",d:"Stability for me and my future",t:["finance","tech","law","business","practical","management"]},
+    {l:"Meaning and purpose",d:"Knowing my work genuinely matters",t:["social","health","education","environment","service","caring"]},
+    {l:"Variety, excitement and action",d:"No two days the same — I thrive on that",t:["active","creative","fieldwork","adventure","action","police"]},
+    {l:"Balance and wellbeing",d:"A stable and healthy everyday life",t:["remote","education","wellness","design","routine","teaching"]}]},
+  {cat:"People or things?",txt:"What do you prefer spending most of your day doing?",opts:[
+    {l:"Helping, caring for or teaching people",d:"Direct support for individuals",t:["social","health","education","leadership","service","caring","nursing"]},
+    {l:"Working with technology and systems",d:"Code, data and digital tools",t:["tech","AI","engineering","data","digital","analytical"]},
+    {l:"Building, fixing or creating things",d:"Hands-on, physical, tangible results",t:["engineering","hands-on","practical","trade","crafts","construction"]},
+    {l:"Reading, writing and researching",d:"Intellectual deep work",t:["research","law","writing","science","analytical","journalism"]}]},
+  {cat:"The big picture",txt:"Which future challenge inspires you most?",opts:[
+    {l:"Health and medical breakthroughs",d:"Better treatments, longer healthy lives",t:["health","medical","science","nursing","biology","caring"]},
+    {l:"Climate and the environment",d:"Renewable energy and sustainability",t:["environment","engineering","green","sustainability","nature"]},
+    {l:"Safety, justice and community",d:"Protecting people and upholding the law",t:["justice","law","police","safety","protective","social"]},
+    {l:"Technology, AI and innovation",d:"Building the digital future",t:["AI","tech","data","engineering","digital"]}]},
+  {cat:"Your superpower",txt:"How would your friends most likely describe you?",opts:[
+    {l:"The problem-solver",d:"Always finds a clever way forward",t:["analytical","engineering","data","tech","practical","detective"]},
+    {l:"The creative one",d:"Fresh perspectives and original ideas",t:["creative","design","art","writing","media","music","crafts"]},
+    {l:"The empathetic listener",d:"People feel truly understood around you",t:["health","social","education","leadership","caring","counselling","nursing"]},
+    {l:"The driven leader",d:"Sets goals and rallies people around them",t:["leadership","business","policy","management","law","police"]}]},
+  {cat:"Social energy",txt:"After a long social day, what recharges you most?",opts:[
+    {l:"Quiet time alone",d:"Reading, thinking or simply unwinding",t:["introverted","research","writing","analytical","independent","technical","focused"]},
+    {l:"More time with people",d:"Social energy genuinely drives me forward",t:["extroverted","social","service","teamwork","leadership","communication","teaching"]},
+    {l:"A creative or digital hobby",d:"Gaming, music, art or tinkering",t:["creative","design","digital","practical","crafts","media","tech"]},
+    {l:"Physical exercise or sport",d:"Moving my body clears my head",t:["active","physical","fieldwork","hands-on","outdoor","sport","police"]}]},
+  {cat:"Communication style",txt:"When sharing an idea, what comes most naturally?",opts:[
+    {l:"Talking and persuading",d:"I love conversations, debates and presenting",t:["communication","leadership","law","social","teaching","journalism","extroverted"]},
+    {l:"Writing it out clearly",d:"I express myself best in writing",t:["writing","research","law","analytical","journalism","creative","introverted"]},
+    {l:"Showing it visually",d:"Sketches, images or making something tangible",t:["design","visual","creative","art","media","architecture","crafts"]},
+    {l:"Listening first, then responding",d:"I observe carefully before I speak",t:["counselling","caring","research","analytical","empathy","health","nursing"]}]},
+  {cat:"Team role",txt:"In a group project, which role do you naturally fall into?",opts:[
+    {l:"The organiser and leader",d:"Takes charge and keeps things moving",t:["leadership","management","business","police","organisation","law"]},
+    {l:"The ideas generator",d:"Comes up with creative angles others miss",t:["creative","innovation","design","research","media","entrepreneurship","art"]},
+    {l:"The one who gets it done",d:"Builds, executes and delivers",t:["practical","engineering","trade","hands-on","crafts","technical","construction"]},
+    {l:"The connector",d:"Makes sure everyone works well together",t:["social","HR","counselling","teamwork","education","service","caring"]}]},
+  {cat:"Risk and pressure",txt:"How do you feel about uncertainty, risk and pressure?",opts:[
+    {l:"I thrive under pressure",d:"Stress and urgency make me sharper",t:["police","emergency","surgery","military","active","fieldwork","action","medicine"]},
+    {l:"I prefer clear rules and structure",d:"Clear expectations help me perform my best",t:["law","finance","administration","teaching","nursing","routine","accounting"]},
+    {l:"I like manageable challenges",d:"Gradual progress and steady improvement",t:["education","counselling","research","design","environment","wellness","social"]},
+    {l:"I love calculated risk-taking",d:"Bold goals require brave decisions",t:["entrepreneurship","business","tech","investment","innovation","startup","creative"]}]},
+  {cat:"What moves you",txt:"Which of these would make you feel most proud?",opts:[
+    {l:"Helping someone through a health crisis",d:"Being there when people need it most",t:["nursing","medicine","health","caring","emergency","social","counselling","medical"]},
+    {l:"Solving a mystery or delivering justice",d:"Finding the truth and making things right",t:["police","detective","law","justice","investigation","analytical","research"]},
+    {l:"Seeing something I built still standing",d:"A bridge, an app, a building — my creation",t:["engineering","architecture","construction","tech","design","crafts","practical"]},
+    {l:"Inspiring or educating an audience",d:"Sharing knowledge that changes lives",t:["teaching","education","journalism","media","communication","writing","social"]}]}
+],
+sv:[
+  {cat:"Hur du tänker",txt:"När du ställs inför ett svårt problem, vad gör du först?",opts:[
+    {l:"Analyserar fakta och siffror",d:"Bryta ner det logiskt, steg för steg",t:["analytical","data","STEM","technical"]},
+    {l:"Skissar eller visualiserar",d:"Rita ut det, göra det konkret",t:["creative","visual","design","art"]},
+    {l:"Pratar igenom det med andra",d:"Samarbete ger de bästa idéerna",t:["social","leadership","communication","teamwork"]},
+    {l:"Experimenterar tills det funkar",d:"Prova, misslyckas, lär sig",t:["science","research","hands-on","practical"]}]},
+  {cat:"Din drivkraft",txt:"Vilken typ av påverkan vill du ha på världen?",opts:[
+    {l:"Skydda och hålla folk trygga",d:"Säkerhet, rättvisa, akutsjukvård",t:["safety","protective","police","emergency","justice","law"]},
+    {l:"Förbättra människors hälsa",d:"Hjälpa folk leva bättre och längre",t:["health","medicine","care","nursing","medical"]},
+    {l:"Driva teknik och vetenskap framåt",d:"Bygga morgondagens lösningar",t:["technology","AI","engineering","digital","science"]},
+    {l:"Skapa ett rättvisare samhälle",d:"Utbildning, lag, minska ojämlikhet",t:["social","policy","law","education","justice","service"]}]},
+  {cat:"Arbetsmiljö",txt:"Vilken arbetsmiljö passar dig bäst?",opts:[
+    {l:"Flexibelt — hemifrån eller varierat",d:"Frihet att välja var jag jobbar",t:["remote","digital","independent","creative","flexible"]},
+    {l:"Livligt kontor, klinik eller studio",d:"Energin av ett team runt mig",t:["collaborative","office","business","teamwork"]},
+    {l:"Utomhus, på plats eller på språng",d:"Variation, rörelse, verkliga världen",t:["hands-on","outdoor","physical","active","fieldwork","trade"]},
+    {l:"Labb, klassrum eller fokuserat rum",d:"Djup koncentration och lugnt arbete",t:["science","research","focused","medical","laboratory","teaching"]}]},
+  {cat:"Favoritämnen",txt:"Vilka skolämnen tyckte du mest om?",opts:[
+    {l:"Matematik och naturvetenskap",d:"Tal, formler och upptäckter",t:["STEM","analytical","engineering","data","technical"]},
+    {l:"Bild, musik och design",d:"Uttrycka idéer kreativt",t:["creative","design","art","media","music","crafts"]},
+    {l:"Språk och litteratur",d:"Skrivande, berättelser, kommunikation",t:["communication","writing","social","law","languages","journalism"]},
+    {l:"Biologi och miljö",d:"Levande varelser, hälsa, natur",t:["science","environment","health","biology","medical","nature"]}]},
+  {cat:"Vad du värdesätter",txt:"Vad är viktigast för dig i ett framtida yrke?",opts:[
+    {l:"Bra lön och ekonomisk trygghet",d:"Stabilitet för mig och min framtid",t:["finance","tech","law","business","practical","management"]},
+    {l:"Mening och syfte",d:"Mitt arbete spelar verkligen roll",t:["social","health","education","environment","service","caring"]},
+    {l:"Variation, spänning och action",d:"Inga två dagar likadana",t:["active","creative","fieldwork","adventure","action","police"]},
+    {l:"Balans och välmående",d:"Stabilt och hälsosamt vardagsliv",t:["remote","education","wellness","design","routine","teaching"]}]},
+  {cat:"Människor eller saker?",txt:"Vad föredrar du att ägna din dag åt?",opts:[
+    {l:"Hjälpa, vårda eller undervisa",d:"Direkt stöd till individer",t:["social","health","education","leadership","service","caring","nursing"]},
+    {l:"Jobba med teknik och system",d:"Kod, data och digitala verktyg",t:["tech","AI","engineering","data","digital","analytical"]},
+    {l:"Bygga, laga eller skapa saker",d:"Praktiskt, fysiskt, konkreta resultat",t:["engineering","hands-on","practical","trade","crafts","construction"]},
+    {l:"Läsa, skriva och forska",d:"Intellektuellt djuparbete",t:["research","law","writing","science","analytical","journalism"]}]},
+  {cat:"Den stora bilden",txt:"Vilken framtidsutmaning inspirerar dig mest?",opts:[
+    {l:"Hälsa och medicinska genombrott",d:"Bättre behandlingar, längre liv",t:["health","medical","science","nursing","biology","caring"]},
+    {l:"Klimat och miljön",d:"Förnybar energi och hållbarhet",t:["environment","engineering","green","sustainability","nature"]},
+    {l:"Säkerhet, rättvisa och trygghet",d:"Skydda samhällen, upprätthålla lagen",t:["justice","law","police","safety","protective","social"]},
+    {l:"Teknologi, AI och innovation",d:"Bygga den digitala framtiden",t:["AI","tech","data","engineering","digital"]}]},
+  {cat:"Din superkraft",txt:"Hur skulle dina vänner beskriva dig?",opts:[
+    {l:"Problemlösaren",d:"Hittar alltid en smart väg",t:["analytical","engineering","data","tech","practical","detective"]},
+    {l:"Den kreativa",d:"Friska perspektiv, originella idéer",t:["creative","design","art","writing","media","music","crafts"]},
+    {l:"Den empatiska lyssnaren",d:"Folk känner sig förstådda av dig",t:["health","social","education","leadership","caring","counselling","nursing"]},
+    {l:"Den drivna ledaren",d:"Sätter mål och samlar folk",t:["leadership","business","policy","management","law","police"]}]},
+  {cat:"Social energi",txt:"Vad laddar dig mest efter en lång social dag?",opts:[
+    {l:"Lugn tid ensam",d:"Läsa, tänka, varva ner",t:["introverted","research","writing","analytical","independent","technical","focused"]},
+    {l:"Mer tid med folk",d:"Social energi driver mig",t:["extroverted","social","service","teamwork","leadership","communication","teaching"]},
+    {l:"En kreativ eller digital hobby",d:"Gaming, musik, konst",t:["creative","design","digital","practical","crafts","media","tech"]},
+    {l:"Fysisk rörelse eller sport",d:"Röra kroppen rensar huvudet",t:["active","physical","fieldwork","hands-on","outdoor","sport","police"]}]},
+  {cat:"Kommunikationsstil",txt:"När du delar en idé, vad faller sig naturligast?",opts:[
+    {l:"Prata och övertyga",d:"Samtal, debatter, presentationer",t:["communication","leadership","law","social","teaching","journalism","extroverted"]},
+    {l:"Skriva det tydligt",d:"Uttrycker mig bäst i text",t:["writing","research","law","analytical","journalism","creative","introverted"]},
+    {l:"Visa det visuellt",d:"Skisser, bilder, skapa något",t:["design","visual","creative","art","media","architecture","crafts"]},
+    {l:"Lyssna noga, sedan svara",d:"Observerar innan jag talar",t:["counselling","caring","research","analytical","empathy","health","nursing"]}]},
+  {cat:"Teamrollen",txt:"I ett grupparbete, vilken roll tar du naturligt?",opts:[
+    {l:"Organisatören och ledaren",d:"Tar initiativ, håller saker i rörelse",t:["leadership","management","business","police","organisation","law"]},
+    {l:"Idégeneratorn",d:"Kreativa vinklar andra missar",t:["creative","innovation","design","research","media","entrepreneurship","art"]},
+    {l:"Den som verkligen gör det",d:"Bygger, genomför, levererar",t:["practical","engineering","trade","hands-on","crafts","technical","construction"]},
+    {l:"Sammankopplingen",d:"Ser till att alla samarbetar väl",t:["social","HR","counselling","teamwork","education","service","caring"]}]},
+  {cat:"Risk och press",txt:"Hur förhåller du dig till osäkerhet och press?",opts:[
+    {l:"Jag trivs under press",d:"Stress gör mig skarpare",t:["police","emergency","surgery","military","active","fieldwork","action","medicine"]},
+    {l:"Föredrar tydliga regler och struktur",d:"Klara förväntningar hjälper mig",t:["law","finance","administration","teaching","nursing","routine","accounting"]},
+    {l:"Gillar hanterbara utmaningar",d:"Gradvis framsteg och förbättring",t:["education","counselling","research","design","environment","wellness","social"]},
+    {l:"Älskar kalkylerande risktagning",d:"Stora mål kräver modiga beslut",t:["entrepreneurship","business","tech","investment","innovation","startup","creative"]}]},
+  {cat:"Vad rör dig innerst inne",txt:"Vilket av dessa skulle göra dig allra stoltast?",opts:[
+    {l:"Hjälpa någon igenom en hälsokris",d:"Finnas där när folk behöver det",t:["nursing","medicine","health","caring","emergency","social","counselling","medical"]},
+    {l:"Lösa ett mysterium, ge rättvisa",d:"Hitta sanningen och göra rätt",t:["police","detective","law","justice","investigation","analytical","research"]},
+    {l:"Se något jag byggt stå kvar",d:"En bro, en app, en byggnad",t:["engineering","architecture","construction","tech","design","crafts","practical"]},
+    {l:"Inspirera eller utbilda en publik",d:"Dela kunskap som förändrar liv",t:["teaching","education","journalism","media","communication","writing","social"]}]}
+],
+es:[
+  {cat:"Cómo piensas",txt:"Cuando te enfrentas a un problema difícil, ¿cuál es tu primer instinto?",opts:[
+    {l:"Analizar los hechos y los números",d:"Descomponerlo lógicamente, paso a paso",t:["analytical","data","STEM","technical"]},
+    {l:"Esbozarlo o visualizarlo",d:"Dibujarlo y hacerlo concreto",t:["creative","visual","design","art"]},
+    {l:"Hablarlo con otras personas",d:"La colaboración genera las mejores ideas",t:["social","leadership","communication","teamwork"]},
+    {l:"Experimentar hasta que funcione",d:"Probar, fallar, aprender y volver a intentar",t:["science","research","hands-on","practical"]}]},
+  {cat:"Tu motivación",txt:"¿Qué tipo de impacto quieres tener en el mundo?",opts:[
+    {l:"Proteger a las personas y mantenerlas seguras",d:"Seguridad, justicia y emergencias",t:["safety","protective","police","emergency","justice","law"]},
+    {l:"Mejorar la salud de las personas",d:"Ayudar a vivir mejor y más tiempo",t:["health","medicine","care","nursing","medical"]},
+    {l:"Avanzar en tecnología y ciencia",d:"Construir las herramientas del mañana",t:["technology","AI","engineering","digital","science"]},
+    {l:"Crear una sociedad más justa",d:"Educación, ley, reducir desigualdades",t:["social","policy","law","education","justice","service"]}]},
+  {cat:"Entorno de trabajo",txt:"¿Qué entorno de trabajo se adapta mejor a ti?",opts:[
+    {l:"Flexible — remoto o en lugares variados",d:"Libertad para elegir dónde y cuándo trabajo",t:["remote","digital","independent","creative","flexible"]},
+    {l:"Una oficina, clínica o estudio animado",d:"La energía de un equipo a mi alrededor",t:["collaborative","office","business","teamwork"]},
+    {l:"Al aire libre, en campo o en movimiento",d:"Variedad, movimiento y el mundo real",t:["hands-on","outdoor","physical","active","fieldwork","trade"]},
+    {l:"Laboratorio, aula o espacio concentrado",d:"Concentración profunda y trabajo tranquilo",t:["science","research","focused","medical","laboratory","teaching"]}]},
+  {cat:"Asignaturas favoritas",txt:"¿Qué asignaturas disfrutabas más en el colegio?",opts:[
+    {l:"Matemáticas y ciencias",d:"Números, fórmulas y descubrimientos",t:["STEM","analytical","engineering","data","technical"]},
+    {l:"Arte, música y diseño",d:"Expresar ideas creativamente",t:["creative","design","art","media","music","crafts"]},
+    {l:"Idiomas y literatura",d:"Escritura, historias y comunicación",t:["communication","writing","social","law","languages","journalism"]},
+    {l:"Biología y medio ambiente",d:"Seres vivos, salud y mundo natural",t:["science","environment","health","biology","medical","nature"]}]},
+  {cat:"Lo que valoras",txt:"¿Qué es lo más importante para ti en una carrera?",opts:[
+    {l:"Buen sueldo y seguridad económica",d:"Estabilidad para mí y mi futuro",t:["finance","tech","law","business","practical","management"]},
+    {l:"Significado y propósito",d:"Saber que mi trabajo realmente importa",t:["social","health","education","environment","service","caring"]},
+    {l:"Variedad, emoción y acción",d:"Ningún día es igual",t:["active","creative","fieldwork","adventure","action","police"]},
+    {l:"Equilibrio y bienestar",d:"Una vida cotidiana estable y saludable",t:["remote","education","wellness","design","routine","teaching"]}]},
+  {cat:"¿Personas o cosas?",txt:"¿Qué prefieres hacer la mayor parte del día?",opts:[
+    {l:"Ayudar, cuidar o enseñar a personas",d:"Apoyo directo a individuos",t:["social","health","education","leadership","service","caring","nursing"]},
+    {l:"Trabajar con tecnología y sistemas",d:"Código, datos, herramientas digitales",t:["tech","AI","engineering","data","digital","analytical"]},
+    {l:"Construir, reparar o crear cosas",d:"Resultados prácticos y tangibles",t:["engineering","hands-on","practical","trade","crafts","construction"]},
+    {l:"Leer, escribir e investigar",d:"Trabajo intelectual profundo",t:["research","law","writing","science","analytical","journalism"]}]},
+  {cat:"El panorama general",txt:"¿Qué desafío futuro te inspira más?",opts:[
+    {l:"Salud y avances médicos",d:"Mejores tratamientos, vidas más largas",t:["health","medical","science","nursing","biology","caring"]},
+    {l:"Clima y medio ambiente",d:"Energía renovable y sostenibilidad",t:["environment","engineering","green","sustainability","nature"]},
+    {l:"Seguridad, justicia y comunidad",d:"Proteger y aplicar la ley",t:["justice","law","police","safety","protective","social"]},
+    {l:"Tecnología, IA e innovación",d:"Construir el futuro digital",t:["AI","tech","data","engineering","digital"]}]},
+  {cat:"Tu superpoder",txt:"¿Cómo te describirían tus amigos?",opts:[
+    {l:"El solucionador de problemas",d:"Siempre encuentra una salida",t:["analytical","engineering","data","tech","practical","detective"]},
+    {l:"El creativo",d:"Perspectivas frescas e ideas originales",t:["creative","design","art","writing","media","music","crafts"]},
+    {l:"El oyente empático",d:"La gente se siente comprendida contigo",t:["health","social","education","leadership","caring","counselling","nursing"]},
+    {l:"El líder decidido",d:"Marca metas y moviliza a las personas",t:["leadership","business","policy","management","law","police"]}]},
+  {cat:"Energía social",txt:"Después de un día social largo, ¿qué te recarga más?",opts:[
+    {l:"Tiempo tranquilo a solas",d:"Leer, pensar o descansar",t:["introverted","research","writing","analytical","independent","technical","focused"]},
+    {l:"Más tiempo con personas",d:"La energía social me impulsa",t:["extroverted","social","service","teamwork","leadership","communication","teaching"]},
+    {l:"Una afición creativa o digital",d:"Videojuegos, música, arte",t:["creative","design","digital","practical","crafts","media","tech"]},
+    {l:"Ejercicio físico o deporte",d:"Mover el cuerpo despeja mi mente",t:["active","physical","fieldwork","hands-on","outdoor","sport","police"]}]},
+  {cat:"Estilo de comunicación",txt:"Al compartir una idea, ¿qué te sale natural?",opts:[
+    {l:"Hablar y persuadir",d:"Me encantan conversaciones y debates",t:["communication","leadership","law","social","teaching","journalism","extroverted"]},
+    {l:"Escribirlo con claridad",d:"Me expreso mejor por escrito",t:["writing","research","law","analytical","journalism","creative","introverted"]},
+    {l:"Mostrarlo visualmente",d:"Bocetos, imágenes, algo tangible",t:["design","visual","creative","art","media","architecture","crafts"]},
+    {l:"Escuchar primero, luego responder",d:"Observo antes de hablar",t:["counselling","caring","research","analytical","empathy","health","nursing"]}]},
+  {cat:"Rol en el equipo",txt:"En un proyecto grupal, ¿qué papel asumes?",opts:[
+    {l:"El organizador y líder",d:"Toma la iniciativa y mantiene el ritmo",t:["leadership","management","business","police","organisation","law"]},
+    {l:"El generador de ideas",d:"Ángulos creativos que otros no ven",t:["creative","innovation","design","research","media","entrepreneurship","art"]},
+    {l:"El que hace las cosas",d:"Construye, ejecuta y entrega",t:["practical","engineering","trade","hands-on","crafts","technical","construction"]},
+    {l:"El conector",d:"Todos trabajan bien juntos",t:["social","HR","counselling","teamwork","education","service","caring"]}]},
+  {cat:"Riesgo y presión",txt:"¿Cómo te sientes ante la incertidumbre y la presión?",opts:[
+    {l:"Rindo mejor bajo presión",d:"El estrés me agudiza",t:["police","emergency","surgery","military","active","fieldwork","action","medicine"]},
+    {l:"Prefiero reglas y estructura claras",d:"Las expectativas claras me ayudan",t:["law","finance","administration","teaching","nursing","routine","accounting"]},
+    {l:"Me gustan los retos manejables",d:"Progreso gradual y constante",t:["education","counselling","research","design","environment","wellness","social"]},
+    {l:"Me encanta asumir riesgos calculados",d:"Los grandes objetivos requieren valentía",t:["entrepreneurship","business","tech","investment","innovation","startup","creative"]}]},
+  {cat:"Lo que te mueve",txt:"¿Cuál de estas cosas te haría sentir más orgulloso?",opts:[
+    {l:"Ayudar a alguien en una crisis de salud",d:"Estar presente cuando más se necesita",t:["nursing","medicine","health","caring","emergency","social","counselling","medical"]},
+    {l:"Resolver un misterio o impartir justicia",d:"Encontrar la verdad y hacer lo correcto",t:["police","detective","law","justice","investigation","analytical","research"]},
+    {l:"Ver algo que construí en pie",d:"Un puente, una app, un edificio",t:["engineering","architecture","construction","tech","design","crafts","practical"]},
+    {l:"Inspirar o educar a una audiencia",d:"Compartir conocimiento que cambia vidas",t:["teaching","education","journalism","media","communication","writing","social"]}]}
+]};
+
+/* ════════════════════════════════════════════════════
+   CAREER DATABASE
+════════════════════════════════════════════════════ */
+const Careers = {
+en:[
+  {t:"Nurse / Registered Nurse",tags:["nursing","health","caring","medical","social","service","practical","biology","medicine","emergency"],desc:"The backbone of healthcare. Direct patient care, emotional support and life-saving intervention every day.",salary:"€2,800–€4,500 / mo",outlook:"Always in demand"},
+  {t:"Doctor / Physician",tags:["medicine","health","science","biology","medical","caring","analytical","research","STEM"],desc:"Diagnose illness and treat patients. Demanding, but one of the most respected and meaningful careers.",salary:"€5,500–€14,000 / mo",outlook:"Very stable"},
+  {t:"Paramedic",tags:["emergency","health","active","fieldwork","physical","police","action","caring","medicine"],desc:"First on scene in life-or-death situations. Medical skill meets calm decisiveness under extreme pressure.",salary:"€2,500–€4,000 / mo",outlook:"Very stable"},
+  {t:"Mental Health Counsellor",tags:["counselling","social","empathy","caring","health","education","introverted","psychology","focused"],desc:"Support people through life's hardest emotional moments. In critical and growing demand worldwide.",salary:"€2,800–€4,500 / mo",outlook:"Growing fast"},
+  {t:"Physiotherapist",tags:["health","physical","active","caring","medical","practical","hands-on","biology","sport"],desc:"Help people recover from injury and regain movement. Found in hospitals, clinics and sports clubs.",salary:"€2,800–€4,200 / mo",outlook:"Stable"},
+  {t:"Dentist",tags:["medicine","health","science","biology","medical","hands-on","focused","practical"],desc:"Diagnose and treat oral health conditions. A highly skilled clinical profession with strong earnings.",salary:"€4,500–€12,000 / mo",outlook:"Very stable"},
+  {t:"Pharmacist",tags:["medicine","health","science","chemistry","analytical","focused","medical","routine"],desc:"Dispense medications, counsel patients on interactions and collaborate with healthcare teams.",salary:"€3,500–€6,500 / mo",outlook:"Very stable"},
+  {t:"Psychiatrist",tags:["medicine","health","psychology","science","medical","empathy","caring","research"],desc:"Diagnose and treat mental health disorders with medication, therapy and clinical judgement.",salary:"€6,000–€16,000 / mo",outlook:"Very stable"},
+  {t:"Midwife",tags:["nursing","health","caring","medical","social","empathy","biology","nature"],desc:"Support women through pregnancy and childbirth. One of healthcare's most meaningful roles.",salary:"€3,000–€4,400 / mo",outlook:"Very stable"},
+  {t:"Radiologist",tags:["medicine","health","science","analytical","STEM","focused","medical","technology"],desc:"Interpret medical images — X-rays, MRIs, CT scans — to diagnose conditions with precision.",salary:"€6,000–€15,000 / mo",outlook:"Very stable"},
+  {t:"Police Officer",tags:["police","justice","safety","law","social","active","fieldwork","leadership","protective","action"],desc:"Protect communities, uphold the law and respond to crises. One of the most varied careers.",salary:"€2,400–€4,500 / mo",outlook:"Very stable"},
+  {t:"Lawyer / Solicitor",tags:["law","justice","analytical","writing","communication","leadership","business","social","introverted"],desc:"Argue cases and help people navigate complex legal systems. Rigorous thinking meets high-stakes communication.",salary:"€4,000–€12,000 / mo",outlook:"Stable"},
+  {t:"Criminal Investigator",tags:["detective","police","justice","analytical","research","law","investigation","introverted","focused"],desc:"Solve crimes, gather evidence and ensure justice is served. Sharp analytical thinking and persistence required.",salary:"€2,800–€5,000 / mo",outlook:"Stable"},
+  {t:"Social Worker",tags:["social","service","caring","education","law","justice","empathy","counselling","teamwork"],desc:"Advocate for vulnerable people — children, families, adults in crisis. A deeply human-centred role.",salary:"€2,400–€3,800 / mo",outlook:"Very stable"},
+  {t:"Teacher / Educator",tags:["teaching","education","social","communication","leadership","service","routine","caring","teamwork"],desc:"Shape young minds and open doors that change lives. One of the most impactful jobs in any society.",salary:"€2,500–€4,000 / mo",outlook:"Very stable"},
+  {t:"School Psychologist",tags:["education","counselling","psychology","social","empathy","caring","focused","analytical"],desc:"Support children's emotional health and learning. A blend of psychology, listening and educational insight.",salary:"€3,000–€4,800 / mo",outlook:"Growing"},
+  {t:"University Professor",tags:["teaching","research","education","analytical","writing","introverted","science","focused"],desc:"Teach at higher education level while conducting original research. Intellectual depth and mentorship combined.",salary:"€3,500–€9,000 / mo",outlook:"Stable"},
+  {t:"Software Developer",tags:["tech","digital","engineering","analytical","STEM","data","remote","practical","technical"],desc:"Build the apps and systems billions use every day. One of the world's most in-demand skills.",salary:"€4,000–€10,000 / mo",outlook:"Very high demand"},
+  {t:"AI & Data Scientist",tags:["AI","data","analytical","STEM","tech","research","engineering","introverted","focused"],desc:"Use machine learning and statistics to build intelligent systems. Our era's most sought-after skill.",salary:"€5,500–€12,000 / mo",outlook:"Critical demand"},
+  {t:"Cybersecurity Analyst",tags:["tech","digital","analytical","STEM","data","technical","focused","research","law"],desc:"Defend organisations against digital threats. Mission-critical in an increasingly digital world.",salary:"€4,200–€9,000 / mo",outlook:"Critical demand"},
+  {t:"UX / Product Designer",tags:["design","creative","tech","visual","digital","research","analytical","communication","empathy"],desc:"Shape how billions interact with digital products. Empathy, creativity and technology, combined.",salary:"€4,000–€9,000 / mo",outlook:"High demand"},
+  {t:"Graphic Designer",tags:["design","creative","visual","art","media","communication","independent","digital","crafts"],desc:"Communicate ideas through visual storytelling — advertising, games, publishing and digital media.",salary:"€2,200–€6,000 / mo",outlook:"Steady"},
+  {t:"Architect",tags:["architecture","design","creative","STEM","engineering","visual","practical","analytical","construction"],desc:"Design the buildings and spaces where life happens — homes, hospitals, public places, city districts.",salary:"€3,200–€8,000 / mo",outlook:"Steady"},
+  {t:"Civil / Structural Engineer",tags:["engineering","STEM","hands-on","practical","construction","analytical","design","technical","fieldwork"],desc:"Design and build infrastructure — bridges, dams, roads, buildings. Engineering shapes the physical world.",salary:"€3,700–€8,000 / mo",outlook:"Stable"},
+  {t:"Mechanical Engineer",tags:["engineering","STEM","hands-on","practical","analytical","design","technical","science"],desc:"Design and develop mechanical systems — from engines to industrial robotics. A cornerstone of manufacturing.",salary:"€3,500–€8,000 / mo",outlook:"Stable"},
+  {t:"Electrician / Tradesperson",tags:["trade","hands-on","practical","technical","physical","engineering","crafts","routine","construction"],desc:"Keep the world running. Always in demand, with strong potential for independent business.",salary:"€2,600–€6,000 / mo",outlook:"Very stable"},
+  {t:"Environmental Scientist",tags:["environment","science","research","biology","green","outdoor","analytical","fieldwork","nature"],desc:"Study and protect the natural world. Monitor pollution, advise on conservation and combat climate change.",salary:"€2,800–€5,500 / mo",outlook:"Growing"},
+  {t:"Biomedical Researcher",tags:["science","biology","research","medical","laboratory","analytical","health","introverted","focused"],desc:"Develop the treatments and cures that will save future lives. Drives progress in medicine and human longevity.",salary:"€3,500–€8,000 / mo",outlook:"Growing"},
+  {t:"Accountant",tags:["finance","business","analytical","STEM","routine","law","management","practical","accounting"],desc:"Manage money, audit companies, guide financial decisions. Found in every industry, in every country.",salary:"€3,000–€7,500 / mo",outlook:"Very stable"},
+  {t:"Marketing Manager",tags:["business","communication","creative","leadership","social","extroverted","data","management"],desc:"Drive brand growth through campaigns, digital strategy and market insight. Creative meets commercial.",salary:"€3,500–€9,000 / mo",outlook:"Steady"},
+  {t:"Management Consultant",tags:["business","analytical","leadership","communication","management","STEM","travel","organised"],desc:"Help organisations solve complex problems and execute strategic change. High pressure, high reward.",salary:"€4,500–€12,000 / mo",outlook:"High demand"},
+  {t:"Entrepreneur",tags:["entrepreneurship","business","leadership","innovation","startup","creative","risk","social","extroverted"],desc:"Build something from nothing. Solve problems, take risks and sometimes change the world in the process.",salary:"Variable",outlook:"High risk, high reward"},
+  {t:"Journalist",tags:["journalism","writing","communication","social","investigation","media","analytical","creative","extroverted"],desc:"Investigate, report and tell stories that matter. Journalism holds power to account and informs the public.",salary:"€2,200–€5,000 / mo",outlook:"Competitive"},
+  {t:"Chef",tags:["creative","practical","hands-on","crafts","art","physical","service","food","extroverted"],desc:"Create culinary experiences that bring people joy. Artistry, precision and a passion for food and culture.",salary:"€2,000–€5,500 / mo",outlook:"Stable"},
+  {t:"Veterinarian",tags:["health","science","biology","caring","medical","hands-on","practical","animals","nature"],desc:"Diagnose and treat animal illness. Medical skill combined with a deep passion for animal welfare.",salary:"€3,500–€8,000 / mo",outlook:"Very stable"},
+  {t:"Commercial Airline Pilot",tags:["tech","active","leadership","travel","focused","STEM","physical","fieldwork","precision"],desc:"Fly commercial aircraft safely across the world. Technically demanding and deeply rewarding.",salary:"€5,000–€15,000 / mo",outlook:"High demand"},
+  {t:"Firefighter",tags:["safety","active","emergency","physical","teamwork","fieldwork","protective","action"],desc:"Respond to fires, accidents and emergencies to protect lives and property. Courage, fitness, teamwork.",salary:"€2,500–€4,500 / mo",outlook:"Very stable"},
+  {t:"Psychologist",tags:["psychology","research","analytical","health","counselling","social","introverted","science","focused","empathy"],desc:"Study the human mind and help people understand their thoughts and behaviour. Psychology touches every corner of society.",salary:"€3,400–€7,000 / mo",outlook:"Growing"},
+  {t:"Musician",tags:["music","creative","art","media","performance","social","extroverted","independent","crafts"],desc:"Create and perform music that moves people emotionally. Challenging, competitive and deeply passionate.",salary:"Variable",outlook:"Competitive"}
+],
+sv:[
+  {t:"Sjuksköterska",tags:["nursing","health","caring","medical","social","service","practical","biology","medicine","emergency"],desc:"Sjukvårdens ryggrad. Direkt patientvård, emotionellt stöd och livsavgörande insatser varje dag.",salary:"€2 800–€4 500 / mån",outlook:"Alltid efterfrågad"},
+  {t:"Läkare",tags:["medicine","health","science","biology","medical","caring","analytical","research","STEM"],desc:"Diagnostisera sjukdomar och behandla patienter. Krävande, men ett av de mest meningsfulla yrkena.",salary:"€5 500–€14 000 / mån",outlook:"Mycket stabilt"},
+  {t:"Ambulanssjukvårdare",tags:["emergency","health","active","fieldwork","physical","police","action","caring","medicine"],desc:"Först på plats i livshotande situationer. Medicinsk kompetens möter lugn och beslutsamhet.",salary:"€2 500–€4 000 / mån",outlook:"Mycket stabilt"},
+  {t:"Kurator / Psykoterapeut",tags:["counselling","social","empathy","caring","health","education","introverted","psychology","focused"],desc:"Stöd människor genom livets svåraste stunder. Kritiskt och växande behov överallt.",salary:"€2 800–€4 500 / mån",outlook:"Växer snabbt"},
+  {t:"Fysioterapeut",tags:["health","physical","active","caring","medical","practical","hands-on","biology","sport"],desc:"Hjälp folk återhämta sig från skador och återfå rörelseförmåga. Sjukhus, kliniker, sportklubbar.",salary:"€2 800–€4 200 / mån",outlook:"Stabilt"},
+  {t:"Tandläkare",tags:["medicine","health","science","biology","medical","hands-on","focused","practical"],desc:"Diagnostisera och behandla oral hälsa. Välbetalt yrke med möjlighet till eget företagande.",salary:"€4 500–€12 000 / mån",outlook:"Mycket stabilt"},
+  {t:"Apotekare",tags:["medicine","health","science","chemistry","analytical","focused","medical","routine"],desc:"Expediera läkemedel, ge råd om biverkningar och samarbeta med vården. Precist och samhällsviktigt.",salary:"€3 500–€6 500 / mån",outlook:"Mycket stabilt"},
+  {t:"Psykiater",tags:["medicine","health","psychology","science","medical","empathy","caring","research"],desc:"Diagnostisera och behandla psykiska sjukdomar med läkemedel, terapi och klinisk bedömning.",salary:"€6 000–€16 000 / mån",outlook:"Mycket stabilt"},
+  {t:"Barnmorska",tags:["nursing","health","caring","medical","social","empathy","biology","nature"],desc:"Stöd under graviditet och förlossning. Ett av sjukvårdens mest meningsfulla yrken.",salary:"€3 000–€4 400 / mån",outlook:"Mycket stabilt"},
+  {t:"Radiolog",tags:["medicine","health","science","analytical","STEM","focused","medical","technology"],desc:"Tolka medicinska bilder — röntgen, MR, CT — för att diagnostisera sjukdomar med precision.",salary:"€6 000–€15 000 / mån",outlook:"Mycket stabilt"},
+  {t:"Polis",tags:["police","justice","safety","law","social","active","fieldwork","leadership","protective","action"],desc:"Skydda samhällen, upprätthålla lagen och svara på kriser. Ett av de mest varierade yrkena.",salary:"€2 400–€4 500 / mån",outlook:"Mycket stabilt"},
+  {t:"Advokat / Jurist",tags:["law","justice","analytical","writing","communication","leadership","business","social","introverted"],desc:"Argumentera mål och hjälpa människor navigera komplexa rättssystem.",salary:"€4 000–€12 000 / mån",outlook:"Stabilt"},
+  {t:"Kriminalinspektör",tags:["detective","police","justice","analytical","research","law","investigation","introverted","focused"],desc:"Lös brott, samla bevis och se till att gärningsmän ställs till svars.",salary:"€2 800–€5 000 / mån",outlook:"Stabilt"},
+  {t:"Socialarbetare",tags:["social","service","caring","education","law","justice","empathy","counselling","teamwork"],desc:"Kämpa för utsatta — barn, familjer och vuxna i kris. Djupt mänskligt yrke.",salary:"€2 400–€3 800 / mån",outlook:"Mycket stabilt"},
+  {t:"Lärare",tags:["teaching","education","social","communication","leadership","service","routine","caring","teamwork"],desc:"Forma unga sinnen och öppna dörrar som förändrar liv. Ett av de mest inflytelserika yrkena.",salary:"€2 500–€4 000 / mån",outlook:"Mycket stabilt"},
+  {t:"Skolpsykolog",tags:["education","counselling","psychology","social","empathy","caring","focused","analytical"],desc:"Stöd barns emotionella hälsa och lärande i skolmiljö.",salary:"€3 000–€4 800 / mån",outlook:"Växer"},
+  {t:"Universitetslektor",tags:["teaching","research","education","analytical","writing","introverted","science","focused"],desc:"Undervisa på högre nivå och bedriva forskning. Intellektuellt djup möter handledning.",salary:"€3 500–€9 000 / mån",outlook:"Stabilt"},
+  {t:"Mjukvaruutvecklare",tags:["tech","digital","engineering","analytical","STEM","data","remote","practical","technical"],desc:"Bygg appar och system som miljarder använder. Världens mest efterfrågade kompetens.",salary:"€4 000–€10 000 / mån",outlook:"Mycket hög efterfrågan"},
+  {t:"AI & Data Scientist",tags:["AI","data","analytical","STEM","tech","research","engineering","introverted","focused"],desc:"Bygg intelligenta system med maskininlärning. Vår tids mest eftertraktade färdighet.",salary:"€5 500–€12 000 / mån",outlook:"Kritisk efterfrågan"},
+  {t:"Cybersäkerhetsanalytiker",tags:["tech","digital","analytical","STEM","data","technical","focused","research","law"],desc:"Försvara organisationer mot hackare och digitala hot.",salary:"€4 200–€9 000 / mån",outlook:"Kritisk efterfrågan"},
+  {t:"UX / Produktdesigner",tags:["design","creative","tech","visual","digital","research","analytical","communication","empathy"],desc:"Forma hur miljarder interagerar med digitala produkter.",salary:"€4 000–€9 000 / mån",outlook:"Hög efterfrågan"},
+  {t:"Grafisk designer",tags:["design","creative","visual","art","media","communication","independent","digital","crafts"],desc:"Kommunicera idéer genom visuellt berättande inom reklam, spel, förlag och digital media.",salary:"€2 200–€6 000 / mån",outlook:"Stabilt"},
+  {t:"Arkitekt",tags:["architecture","design","creative","STEM","engineering","visual","practical","analytical","construction"],desc:"Designa byggnader och miljöer där livet utspelar sig.",salary:"€3 200–€8 000 / mån",outlook:"Stabilt"},
+  {t:"Byggnadsingenjör",tags:["engineering","STEM","hands-on","practical","construction","analytical","design","technical","fieldwork"],desc:"Designa och bygg infrastruktur — broar, vägar, byggnader.",salary:"€3 700–€8 000 / mån",outlook:"Stabilt"},
+  {t:"Maskiningenjör",tags:["engineering","STEM","hands-on","practical","analytical","design","technical","science"],desc:"Designa och utveckla mekaniska system — från bilmotorer till industrirobotar.",salary:"€3 500–€8 000 / mån",outlook:"Stabilt"},
+  {t:"Elektriker / Hantverkare",tags:["trade","hands-on","practical","technical","physical","engineering","crafts","routine","construction"],desc:"Håll världen igång. Alltid efterfrågade, med stor potential för eget företagande.",salary:"€2 600–€6 000 / mån",outlook:"Mycket stabilt"},
+  {t:"Miljövetare",tags:["environment","science","research","biology","green","outdoor","analytical","fieldwork","nature"],desc:"Studera och skydda naturen — övervaka föroreningar och bekämpa klimatförändringar.",salary:"€2 800–€5 500 / mån",outlook:"Växer"},
+  {t:"Biomedicinsk forskare",tags:["science","biology","research","medical","laboratory","analytical","health","introverted","focused"],desc:"Utveckla behandlingar och botemedel som räddar framtida liv.",salary:"€3 500–€8 000 / mån",outlook:"Växer"},
+  {t:"Revisor / Ekonom",tags:["finance","business","analytical","STEM","routine","law","management","practical","accounting"],desc:"Hantera pengar, granska bolag och ge ekonomiska råd. Finns i alla branscher.",salary:"€3 000–€7 500 / mån",outlook:"Mycket stabilt"},
+  {t:"Marknadsföringschef",tags:["business","communication","creative","leadership","social","extroverted","data","management"],desc:"Driv varumärkestillväxt genom kampanjer, digital strategi och marknadsanalys.",salary:"€3 500–€9 000 / mån",outlook:"Stabilt"},
+  {t:"Managementkonsult",tags:["business","analytical","leadership","communication","management","STEM","travel","organised"],desc:"Hjälpa organisationer lösa komplexa problem och genomföra strategisk förändring.",salary:"€4 500–€12 000 / mån",outlook:"Hög efterfrågan"},
+  {t:"Entreprenör",tags:["entrepreneurship","business","leadership","innovation","startup","creative","risk","social","extroverted"],desc:"Bygg något från ingenting. Lös problem, ta risker, ibland förändra världen.",salary:"Varierar",outlook:"Hög risk, hög belöning"},
+  {t:"Journalist",tags:["journalism","writing","communication","social","investigation","media","analytical","creative","extroverted"],desc:"Undersök, rapportera och berätta historier som spelar roll.",salary:"€2 200–€5 000 / mån",outlook:"Konkurrensutsatt"},
+  {t:"Kock",tags:["creative","practical","hands-on","crafts","art","physical","service","food","extroverted"],desc:"Skapa kulinariska upplevelser som ger folk glädje. Konstnärskap, precision och passion.",salary:"€2 000–€5 500 / mån",outlook:"Stabilt"},
+  {t:"Veterinär",tags:["health","science","biology","caring","medical","hands-on","practical","animals","nature"],desc:"Diagnostisera och behandla djursjukdomar. Medicinsk kunskap möter djurpassion.",salary:"€3 500–€8 000 / mån",outlook:"Mycket stabilt"},
+  {t:"Trafikflygare",tags:["tech","active","leadership","travel","focused","STEM","physical","fieldwork","precision"],desc:"Flyga kommersiella flygplan säkert. Tekniskt krävande och belönande.",salary:"€5 000–€15 000 / mån",outlook:"Hög efterfrågan"},
+  {t:"Brandman",tags:["safety","active","emergency","physical","teamwork","fieldwork","protective","action"],desc:"Svara på bränder och olyckor för att skydda liv och egendom. Mod, kondition, lagarbete.",salary:"€2 500–€4 500 / mån",outlook:"Mycket stabilt"},
+  {t:"Psykolog",tags:["psychology","research","analytical","health","counselling","social","introverted","science","focused","empathy"],desc:"Studera det mänskliga sinnet och hjälp människor förstå sina tankar och beteenden.",salary:"€3 400–€7 000 / mån",outlook:"Växer"},
+  {t:"Musiker",tags:["music","creative","art","media","performance","social","extroverted","independent","crafts"],desc:"Skapa och framföra musik som berör människor. Utmanande, konkurrensutsatt, passionerat.",salary:"Varierar",outlook:"Konkurrensutsatt"}
+],
+es:[
+  {t:"Enfermero/a",tags:["nursing","health","caring","medical","social","service","practical","biology","medicine","emergency"],desc:"La columna vertebral de la sanidad. Atención directa al paciente, apoyo emocional e intervenciones vitales.",salary:"€2.800–€4.500 / mes",outlook:"Siempre demandado"},
+  {t:"Médico",tags:["medicine","health","science","biology","medical","caring","analytical","research","STEM"],desc:"Diagnosticar enfermedades y tratar pacientes. Exigente, pero una de las carreras más significativas.",salary:"€5.500–€14.000 / mes",outlook:"Muy estable"},
+  {t:"Paramédico",tags:["emergency","health","active","fieldwork","physical","police","action","caring","medicine"],desc:"Primero en llegar a situaciones de vida o muerte. Habilidad médica y serenidad bajo presión extrema.",salary:"€2.500–€4.000 / mes",outlook:"Muy estable"},
+  {t:"Consejero/a de salud mental",tags:["counselling","social","empathy","caring","health","education","introverted","psychology","focused"],desc:"Apoyar a las personas en los momentos más difíciles. Demanda crítica y creciente en todo el mundo.",salary:"€2.800–€4.500 / mes",outlook:"Crecimiento rápido"},
+  {t:"Fisioterapeuta",tags:["health","physical","active","caring","medical","practical","hands-on","biology","sport"],desc:"Ayudar a las personas a recuperarse de lesiones y recuperar el movimiento.",salary:"€2.800–€4.200 / mes",outlook:"Estable"},
+  {t:"Dentista",tags:["medicine","health","science","biology","medical","hands-on","focused","practical"],desc:"Diagnosticar y tratar la salud bucodental. Profesión clínica altamente cualificada con buenos ingresos.",salary:"€4.500–€12.000 / mes",outlook:"Muy estable"},
+  {t:"Farmacéutico/a",tags:["medicine","health","science","chemistry","analytical","focused","medical","routine"],desc:"Dispensar medicamentos, asesorar a pacientes y colaborar con equipos de salud.",salary:"€3.500–€6.500 / mes",outlook:"Muy estable"},
+  {t:"Psiquiatra",tags:["medicine","health","psychology","science","medical","empathy","caring","research"],desc:"Diagnosticar y tratar trastornos mentales con medicación, terapia y juicio clínico.",salary:"€6.000–€16.000 / mes",outlook:"Muy estable"},
+  {t:"Comadrona",tags:["nursing","health","caring","medical","social","empathy","biology","nature"],desc:"Apoyar a las mujeres durante el embarazo y el parto. Uno de los roles más significativos de la sanidad.",salary:"€3.000–€4.400 / mes",outlook:"Muy estable"},
+  {t:"Radiólogo/a",tags:["medicine","health","science","analytical","STEM","focused","medical","technology"],desc:"Interpretar imágenes médicas — radiografías, resonancias, TAC — para diagnosticar enfermedades.",salary:"€6.000–€15.000 / mes",outlook:"Muy estable"},
+  {t:"Agente de policía",tags:["police","justice","safety","law","social","active","fieldwork","leadership","protective","action"],desc:"Proteger comunidades, hacer cumplir la ley y responder a las crisis.",salary:"€2.400–€4.500 / mes",outlook:"Muy estable"},
+  {t:"Abogado/a",tags:["law","justice","analytical","writing","communication","leadership","business","social","introverted"],desc:"Defender casos y ayudar a las personas a navegar por sistemas legales complejos.",salary:"€4.000–€12.000 / mes",outlook:"Estable"},
+  {t:"Detective",tags:["detective","police","justice","analytical","research","law","investigation","introverted","focused"],desc:"Resolver crímenes, recopilar pruebas y garantizar que se haga justicia.",salary:"€2.800–€5.000 / mes",outlook:"Estable"},
+  {t:"Trabajador/a social",tags:["social","service","caring","education","law","justice","empathy","counselling","teamwork"],desc:"Defender a personas vulnerables — niños, familias, adultos en crisis. Un papel profundamente humano.",salary:"€2.400–€3.800 / mes",outlook:"Muy estable"},
+  {t:"Maestro/a",tags:["teaching","education","social","communication","leadership","service","routine","caring","teamwork"],desc:"Moldear mentes jóvenes y abrir puertas que cambian vidas. Uno de los trabajos más impactantes.",salary:"€2.500–€4.000 / mes",outlook:"Muy estable"},
+  {t:"Psicólogo/a escolar",tags:["education","counselling","psychology","social","empathy","caring","focused","analytical"],desc:"Apoyar la salud emocional y el aprendizaje de los niños en el entorno escolar.",salary:"€3.000–€4.800 / mes",outlook:"En crecimiento"},
+  {t:"Profesor/a universitario",tags:["teaching","research","education","analytical","writing","introverted","science","focused"],desc:"Enseñar en educación superior e investigar. Profundidad intelectual y formación combinadas.",salary:"€3.500–€9.000 / mes",outlook:"Estable"},
+  {t:"Desarrollador/a de software",tags:["tech","digital","engineering","analytical","STEM","data","remote","practical","technical"],desc:"Construir las apps y sistemas que usan miles de millones de personas.",salary:"€4.000–€10.000 / mes",outlook:"Muy alta demanda"},
+  {t:"Científico/a de IA y datos",tags:["AI","data","analytical","STEM","tech","research","engineering","introverted","focused"],desc:"Usar aprendizaje automático y estadística para construir sistemas inteligentes.",salary:"€5.500–€12.000 / mes",outlook:"Demanda crítica"},
+  {t:"Analista de ciberseguridad",tags:["tech","digital","analytical","STEM","data","technical","focused","research","law"],desc:"Defender a las organizaciones contra hackers y amenazas digitales.",salary:"€4.200–€9.000 / mes",outlook:"Demanda crítica"},
+  {t:"Diseñador/a UX",tags:["design","creative","tech","visual","digital","research","analytical","communication","empathy"],desc:"Dar forma a cómo miles de millones de personas interactúan con los productos digitales.",salary:"€4.000–€9.000 / mes",outlook:"Alta demanda"},
+  {t:"Diseñador/a gráfico",tags:["design","creative","visual","art","media","communication","independent","digital","crafts"],desc:"Comunicar ideas mediante narración visual — publicidad, videojuegos, edición y medios digitales.",salary:"€2.200–€6.000 / mes",outlook:"Estable"},
+  {t:"Arquitecto/a",tags:["architecture","design","creative","STEM","engineering","visual","practical","analytical","construction"],desc:"Diseñar los edificios y espacios donde transcurre la vida.",salary:"€3.200–€8.000 / mes",outlook:"Estable"},
+  {t:"Ingeniero/a civil",tags:["engineering","STEM","hands-on","practical","construction","analytical","design","technical","fieldwork"],desc:"Diseñar y construir infraestructuras — puentes, carreteras, edificios.",salary:"€3.700–€8.000 / mes",outlook:"Estable"},
+  {t:"Ingeniero/a mecánico",tags:["engineering","STEM","hands-on","practical","analytical","design","technical","science"],desc:"Diseñar y desarrollar sistemas mecánicos — desde motores hasta robots industriales.",salary:"€3.500–€8.000 / mes",outlook:"Estable"},
+  {t:"Electricista",tags:["trade","hands-on","practical","technical","physical","engineering","crafts","routine","construction"],desc:"Mantener el mundo en funcionamiento. Siempre demandados, con gran potencial autónomo.",salary:"€2.600–€6.000 / mes",outlook:"Muy estable"},
+  {t:"Científico/a medioambiental",tags:["environment","science","research","biology","green","outdoor","analytical","fieldwork","nature"],desc:"Estudiar y proteger el mundo natural — monitorear la contaminación y combatir el cambio climático.",salary:"€2.800–€5.500 / mes",outlook:"En crecimiento"},
+  {t:"Investigador/a biomédico",tags:["science","biology","research","medical","laboratory","analytical","health","introverted","focused"],desc:"Desarrollar tratamientos y curas que salvarán vidas futuras.",salary:"€3.500–€8.000 / mes",outlook:"En crecimiento"},
+  {t:"Contable",tags:["finance","business","analytical","STEM","routine","law","management","practical","accounting"],desc:"Gestionar el dinero, auditar empresas y guiar decisiones financieras. Presente en todas las industrias.",salary:"€3.000–€7.500 / mes",outlook:"Muy estable"},
+  {t:"Director/a de marketing",tags:["business","communication","creative","leadership","social","extroverted","data","management"],desc:"Impulsar el crecimiento de la marca con campañas, estrategia digital y análisis de mercado.",salary:"€3.500–€9.000 / mes",outlook:"Estable"},
+  {t:"Consultor/a de gestión",tags:["business","analytical","leadership","communication","management","STEM","travel","organised"],desc:"Ayudar a las organizaciones a resolver problemas complejos y ejecutar cambios estratégicos.",salary:"€4.500–€12.000 / mes",outlook:"Alta demanda"},
+  {t:"Emprendedor/a",tags:["entrepreneurship","business","leadership","innovation","startup","creative","risk","social","extroverted"],desc:"Construir algo de la nada. Resolver problemas, asumir riesgos, a veces cambiar el mundo.",salary:"Variable",outlook:"Alto riesgo, alta recompensa"},
+  {t:"Periodista",tags:["journalism","writing","communication","social","investigation","media","analytical","creative","extroverted"],desc:"Investigar, informar y contar historias que importan.",salary:"€2.200–€5.000 / mes",outlook:"Competitivo"},
+  {t:"Chef",tags:["creative","practical","hands-on","crafts","art","physical","service","food","extroverted"],desc:"Crear experiencias culinarias que dan alegría. Arte, precisión y pasión por la comida.",salary:"€2.000–€5.500 / mes",outlook:"Estable"},
+  {t:"Veterinario/a",tags:["health","science","biology","caring","medical","hands-on","practical","animals","nature"],desc:"Diagnosticar y tratar enfermedades animales. Habilidad médica combinada con pasión por el bienestar animal.",salary:"€3.500–€8.000 / mes",outlook:"Muy estable"},
+  {t:"Piloto de línea aérea",tags:["tech","active","leadership","travel","focused","STEM","physical","fieldwork","precision"],desc:"Volar aviones comerciales con seguridad. Técnicamente exigente y gratificante.",salary:"€5.000–€15.000 / mes",outlook:"Alta demanda"},
+  {t:"Bombero/a",tags:["safety","active","emergency","physical","teamwork","fieldwork","protective","action"],desc:"Responder a incendios y emergencias para proteger vidas y propiedades. Valor, condición física, equipo.",salary:"€2.500–€4.500 / mes",outlook:"Muy estable"},
+  {t:"Psicólogo/a",tags:["psychology","research","analytical","health","counselling","social","introverted","science","focused","empathy"],desc:"Estudiar la mente humana y ayudar a las personas a comprender sus pensamientos y comportamientos.",salary:"€3.400–€7.000 / mes",outlook:"En crecimiento"},
+  {t:"Músico/a",tags:["music","creative","art","media","performance","social","extroverted","independent","crafts"],desc:"Crear e interpretar música que emociona. Desafiante, competitivo, profundamente apasionado.",salary:"Variable",outlook:"Competitivo"}
+]};
+
+/* ════════════════════════════════════════════════════
+   KB  (career explorer)
+════════════════════════════════════════════════════ */
+const KB = {
+en:[
+  {keys:["police","police officer","cop","detective","constable"],icon:"⊕",field:"Law Enforcement",quote:"Every day a police officer makes a difference for real people in real situations — that's what drives them.",personality:["Calm and decisive under pressure","Strong sense of justice and integrity","Empathetic yet firm","Loyal team player"],interests:["Community safety and justice","Physical training","Criminology","Law and order"],like:["Working with people in difficult moments","Varied unpredictable days","Physically and mentally challenging tasks","Making communities safer"],need:["Physical and mental resilience","Communication and conflict resolution","Teamwork and leadership","Ethics and judgement"]},
+  {keys:["nurse","nursing","registered nurse","midwife","paramedic"],icon:"⊕",field:"Healthcare",quote:"You are often the person patients remember most — not the doctor, but the one who held their hand.",personality:["Deeply empathetic","Calm in stressful moments","Meticulous and responsible","Driven to help"],interests:["Medical science","Human relationships","Healthcare technology","Public health"],like:["Direct patient contact each day","Working in a close bonded team","Quick decisions in critical moments","Seeing patients recover"],need:["Clinical competence","Emotional resilience","Accuracy and attention to detail","Clear communication"]},
+  {keys:["doctor","physician","surgeon","gp","general practitioner"],icon:"⊕",field:"Medicine",quote:"Medicine is the art of combining science with compassion — every patient is a unique puzzle.",personality:["Analytically curious","Patient and methodical","Empathetic yet grounded","Deeply committed"],interests:["Biology and medical science","Problem-solving and diagnostics","Human physiology","Research and advancement"],like:["Solving complex diagnostic challenges","Long-term patient relationships","Continuous learning and research","Making decisive differences to lives"],need:["Deep medical knowledge","Decisiveness under pressure","Communication with patients and families","Lifelong learning"]},
+  {keys:["chef","cook","baker","pastry chef","head chef","culinary","kitchen"],icon:"⊕",field:"Culinary Arts",quote:"Seeing guests' faces when they take the first bite of something you created — that is priceless.",personality:["Creative and sensory","Resilient and quick-thinking","Perfectionist with eye for detail","Passionate about flavours"],interests:["Cooking, baking and food preparation","Sourcing quality produce","Global food cultures","The creative process behind a menu"],like:["Working with your hands","Fast-paced service periods","Experimenting with flavours","Seeing satisfied guests"],need:["Refined sense of taste and smell","Speed and physical precision","Stress tolerance","Creativity with discipline"]},
+  {keys:["architect","architecture","urban planner","landscape architect"],icon:"⊕",field:"Architecture",quote:"You don't just draw buildings — you create the places where people's lives unfold.",personality:["Creative and visual","Analytical and technical","Patient with long projects","Collaborative communicator"],interests:["Form, space and aesthetics","Building technology and materials","Urban planning","Architectural history"],like:["Drawing and visualising ideas","Blending art with engineering","Watching projects grow from sketch to reality","Working with creative teams"],need:["Spatial and visual awareness","Technical understanding of construction","CAD design tools","Client communication"]},
+  {keys:["pilot","airline pilot","captain","co-pilot","helicopter pilot","aviator"],icon:"⊕",field:"Aviation",quote:"Flying is a craft that demands precision, calm and endless dedication to your training.",personality:["Calm, disciplined and methodical","Analytically precise","Deeply responsible","Independent yet team-oriented"],interests:["Aviation and aeronautics","Meteorology and navigation","Advanced engineering systems","Geography and the wider world"],like:["Working with highly advanced technology","Responsibility for passenger safety","Travelling and experiencing different countries","Solving complex navigation challenges"],need:["Spatial awareness","Calm decision-making under pressure","Technical precision","Physical and mental fitness"]},
+  {keys:["engineer","engineering","mechanical engineer","civil engineer","electrical engineer"],icon:"⊕",field:"Engineering",quote:"Engineers solve problems the world doesn't yet know it has.",personality:["Analytical and logical","Meticulous and systematic","Curious about how things work","Persistent and solution-focused"],interests:["Mathematics, physics and applied science","Technology and machinery","Construction and structural systems","Innovation and problem-solving"],like:["Solving technical problems from first principles","Seeing solutions become physical reality","Working with calculations and models","Collaborating in cross-disciplinary teams"],need:["Strong mathematics and physics","Analytical thinking","Computer-aided design tools","Project management"]},
+  {keys:["teacher","educator","lecturer","professor","tutor","instructor"],icon:"⊕",field:"Education",quote:"A great teacher changes a student's future — and sometimes their entire life.",personality:["Patient and engaged","Empathetic and tuned-in","Creative in teaching","Inspiring and motivating"],interests:["Learning science and pedagogy","Child and adolescent development","Subject expertise","Society and the future of education"],like:["Watching students understand and grow","Explaining complex ideas simply","Building relationships with students","Planning varied lessons"],need:["Clear communication and storytelling","Patience and empathy","Deep subject knowledge","Ability to motivate diverse learners"]},
+  {keys:["psychologist","psychology","clinical psychologist","therapist","counsellor"],icon:"⊕",field:"Psychology",quote:"Helping someone understand themselves better is one of the deepest gifts you can give.",personality:["Deeply empathetic listener","Analytical and rigorous","Patient and non-judgmental","Profoundly curious about the mind"],interests:["Human behaviour and cognition","Psychology and neuroscience","Therapeutic approaches","Academic research"],like:["Understanding complex inner lives","Methodical long-term work","Identifying behavioural patterns","Combining science with warmth"],need:["Deep empathy and listening","Analytical and critical thinking","Scientific methodology","Strong professional ethics"]},
+  {keys:["journalist","reporter","editor","correspondent","freelance journalist"],icon:"⊕",field:"Journalism",quote:"Journalists give a voice to those who are not heard — and hold power to account.",personality:["Relentlessly curious","Fast-thinking and stress-tolerant","Courageous in asking difficult questions","Articulate and persuasive"],interests:["Politics and current affairs","Storytelling and writing craft","Source evaluation and fact-checking","Digital media and photography"],like:["Digging into a story to find the truth","Interviewing people of all kinds","Publishing under tight deadlines","Telling stories that matter"],need:["Strong writing and narrative craft","Rigorous source criticism","Quick accurate judgement","Digital literacy"]},
+  {keys:["electrician","plumber","tradesperson","carpenter","builder","construction","mechanic"],icon:"⊕",field:"Skilled Trades",quote:"Tradespeople build and maintain the world that everyone else takes for granted.",personality:["Highly practical","Resourceful and inventive","Detail-conscious","Reliable and self-sufficient"],interests:["Technical systems and mechanics","Construction and structural work","Electrical installations","Real-world problem-solving"],like:["Seeing concrete tangible results","Working at varied locations","Solving practical on-site problems","The independence of the work"],need:["Strong technical understanding","Physical coordination and dexterity","Safety awareness","Clear client communication"]},
+  {keys:["graphic designer","designer","illustrator","art director","visual artist"],icon:"⊕",field:"Graphic Design",quote:"Design is never just how something looks — it's about how it works and what it says.",personality:["Visually attuned and aesthetic","Creative and original","Detail-focused and precise","Open to feedback"],interests:["Typography, colour and layout","Brand identity and visual systems","Digital and print production","Art history and visual culture"],like:["Solving communication problems creatively","Building brands from scratch","Watching ideas become compelling visuals","Balancing aesthetics with function"],need:["Design tool proficiency","Compositional and colour sensitivity","Client communication","Iterative working mindset"]},
+  {keys:["social worker","case worker","welfare","family support","community worker","youth worker"],icon:"⊕",field:"Social Work",quote:"Social workers are society's safety net — present when everything else has broken down.",personality:["Deeply empathetic","Resilient and robust","Committed to fairness","Non-judgmental listener"],interests:["Social issues and human rights","Child and family welfare","Psychology and behaviour","Legislation and rights"],like:["Making concrete difference for vulnerable people","Building trust with clients","Coordinating across agencies","Navigating complex life situations"],need:["Empathy and emotional endurance","Knowledge of social care law","Case documentation","Professional boundaries"]},
+  {keys:["accountant","finance","financial analyst","economist","auditor","banking"],icon:"⊕",field:"Finance",quote:"Behind every successful organisation is someone who makes sure the numbers tell the right story.",personality:["Analytically sharp","Meticulous with detail","Reliable and trustworthy","Structured and organised"],interests:["Numbers and financial flows","Business strategy","Accounting and reporting","Investments and markets"],like:["Working with data and models","Creating clarity in complex flows","Providing insights that influence decisions","Understanding how businesses work"],need:["Strong mathematical ability","Precision and attention to detail","Financial software","Analytical thinking"]},
+  {keys:["environmental scientist","ecologist","environmentalist","climate","sustainability","conservation"],icon:"⊕",field:"Environment",quote:"Working on the climate is working for every future generation — no task is more urgent.",personality:["Passionate about the natural world","Scientifically rigorous","Patient with long-term processes","Articulate communicator"],interests:["Nature, ecology and biodiversity","Climate science and energy","Environmental policy","Data and environmental analysis"],like:["Working outdoors and in the field","Analysing environmental data","Influencing policy","Contributing to a sustainable future"],need:["Natural science knowledge","GIS and data analysis","Reporting and communication","Long-term resilience"]},
+  {keys:["firefighter","fire service","rescue","fire officer","emergency services"],icon:"⊕",field:"Fire & Rescue",quote:"Firefighters run towards danger when everyone else is running away — courage, training and teamwork.",personality:["Courageous and action-oriented","Calm in chaos","Unwavering team player","Physically strong and resilient"],interests:["Emergency response","Firefighting technology","Physical training","Community protection"],like:["Working in a tight high-trust team","Responding to unpredictable situations","Physical training as part of the job","Saving lives and property"],need:["High physical fitness","Calm decision-making","Effective teamwork","Technical competence with equipment"]},
+  {keys:["vet","veterinarian","veterinary","veterinary nurse","animal care"],icon:"⊕",field:"Veterinary Medicine",quote:"Animals can't tell you what's wrong — a vet must understand without words.",personality:["Animal lover with deep empathy","Analytically curious","Patient and dexterous","Empathetic to worried owners"],interests:["Animals and animal biology","Veterinary medicine and physiology","Natural sciences","Animal behaviour"],like:["Working with animals every day","Solving medical mysteries","Supporting concerned owners","Combining practice with science"],need:["Veterinary and biological knowledge","Manual dexterity","Emotional endurance","Communication with owners"]},
+  {keys:["musician","artist","singer","composer","producer","songwriter","performer","music"],icon:"⊕",field:"Music",quote:"Music is the only language every human being understands — creating it is a gift and a calling.",personality:["Deeply creative and expressive","Disciplined and dedicated","Emotionally reflective","Courageous in sharing yourself"],interests:["Music across all genres","Composition and production","Live performance","Music technology"],like:["Practising and creating daily","Performing live","Collaborating with other musicians","Expressing emotion through sound"],need:["High technical musical skill","Self-discipline and practice","Emotional courage","Business acumen and networking"]},
+  {keys:["dentist","dental","orthodontist","oral surgeon"],icon:"⊕",field:"Dentistry",quote:"A dentist gives people confidence — a great smile changes how someone walks into a room.",personality:["Precise and detail-focused","Calm with anxious patients","Independent yet team-oriented","Entrepreneurial"],interests:["Anatomy and oral health","Clinical procedures","Patient care","Independent practice"],like:["Hands-on precise clinical work","Long-term patient relationships","Combining science with aesthetics","Clear satisfying results"],need:["Manual dexterity","Biology and chemistry knowledge","Patient communication","Practice management"]},
+  {keys:["pharmacist","pharmacy","pharmaceutical","dispensing"],icon:"⊕",field:"Pharmacy",quote:"A pharmacist is the last line of defence before medication reaches a patient — precision saves lives.",personality:["Detail-oriented","Trustworthy and calm","Analytical","Approachable"],interests:["Chemistry and drug interactions","Patient counselling","Healthcare systems","Pharmaceutical development"],like:["Ensuring patient safety","Advising on medication","Combining science with interaction","Structured environment"],need:["Pharmacology knowledge","Accuracy and attention","Communication with patients","Regulatory knowledge"]},
+  {keys:["marketing","marketing manager","brand","advertising","digital marketing","campaign"],icon:"⊕",field:"Marketing",quote:"Great marketing doesn't feel like marketing — it tells a story people want to be part of.",personality:["Creative and commercially sharp","Data-driven yet intuitive","Outgoing and persuasive","Adaptable to change"],interests:["Consumer psychology","Brand storytelling","Digital platforms","Culture and trends"],like:["Launching campaigns","Analysing performance data","Collaborating across teams","Building brands"],need:["Strategic creativity","Data and analytics","Strong writing","Digital tool proficiency"]},
+  {keys:["consultant","management consultant","strategy consultant","business consultant"],icon:"⊕",field:"Consulting",quote:"Consultants see the problems that organisations are too close to see themselves.",personality:["Analytically brilliant","Confident with senior leaders","Structured thinker","Adaptable across industries"],interests:["Business strategy","Data analysis","Organisational design","Finance and economics"],like:["Solving varied client problems","Presenting analysis clearly","Working at pace","Collaborating with smart teams"],need:["Structured problem-solving","Excel and modelling","Slide-based storytelling","Project management"]}
+],
+sv:[
+  {keys:["polis","polisarbete","ordningspolis","detektiv"],icon:"⊕",field:"Rättsväsende",quote:"Att varje dag göra skillnad för riktiga människor i riktiga situationer — det är vad som driver en polis.",personality:["Lugn och beslutsam under press","Rättvisekänsla och integritet","Empatisk men bestämd","Lagspelare med naturligt ledarskap"],interests:["Samhällstrygghet och rättvisa","Fysisk träning","Kriminologi","Lag och ordning"],like:["Arbeta med människor i svåra situationer","Varierade och oförutsägbara dagar","Fysiskt och mentalt utmanande uppgifter","Göra samhället tryggare"],need:["Fysisk och mental uthållighet","Kommunikation och konflikthantering","Lagarbete och ledarskap","Etik och omdöme"]},
+  {keys:["sjuksköterska","sjuksköt","barnsjuksköterska","barnmorska","ambulans"],icon:"⊕",field:"Sjukvård",quote:"Du är ofta den person patienterna minns mest — inte läkaren, utan du som höll i handen.",personality:["Djupt empatisk","Lugn i stressiga situationer","Noggrann och ansvarstagande","Driven av att hjälpa"],interests:["Medicinsk vetenskap","Mänskliga relationer","Sjukvårdsteknik","Folkhälsa"],like:["Direkt patientkontakt varje dag","Arbeta i ett nära team","Snabba beslut i kritiska stunder","Se patienter bli friska"],need:["Klinisk kompetens","Emotionell resiliens","Noggrannhet och detaljfokus","Tydlig kommunikation"]},
+  {keys:["läkare","kirurg","allmänläkare","specialist"],icon:"⊕",field:"Medicin",quote:"Medicin är konsten att kombinera vetenskap med medkänsla — varje patient är ett unikt pussel.",personality:["Analytiskt nyfiken","Tålmodig och metodisk","Empatisk men professionell","Djupt engagerad"],interests:["Biologi och medicinsk vetenskap","Problemlösning och diagnostik","Mänsklig fysiologi","Forskning och utveckling"],like:["Lösa komplexa diagnostiska problem","Långvariga patientrelationer","Kontinuerlig inlärning","Göra avgörande skillnad"],need:["Djup medicinsk kunskap","Beslutskraft under press","Kommunikation med patienter","Livslångt lärande"]},
+  {keys:["kock","konditor","bagare","köksmästare","restaurang"],icon:"⊕",field:"Kulinarik",quote:"Att se gästernas ansikten när de tar första tuggan av något du skapat — det är obetalbart.",personality:["Kreativ och sensorisk","Stresstålig och snabbfotad","Perfektionistisk","Passionerad för smaker"],interests:["Matlagning och bak","Råvaror och producenter","Matkulturer","Den kreativa processen"],like:["Arbeta med händerna","Snabba intensiva servicepass","Experimentera med smaker","Se nöjda gäster"],need:["Smak- och luktkänsla","Precision och snabbhet","Stresstålighet","Kreativitet och disciplin"]},
+  {keys:["arkitekt","stadsplanerare","landskapsarkitekt"],icon:"⊕",field:"Arkitektur",quote:"Du ritar inte bara byggnader — du skapar de platser där människors liv utspelar sig.",personality:["Kreativ och visuell","Analytisk och teknisk","Tålmodig med långa projekt","Samarbetsvillig"],interests:["Form, rum och estetik","Byggteknik och material","Samhällsplanering","Arkitekturhistoria"],like:["Rita och visualisera idéer","Kombinera konst och teknik","Se projekt växa från ritning till verklighet","Arbeta med kreativa team"],need:["Rumslig och visuell förmåga","Teknisk förståelse","CAD-verktyg","Kundkommunikation"]},
+  {keys:["pilot","flygkapten","trafikflygare","helikopterpilot"],icon:"⊕",field:"Luftfart",quote:"Att flyga är ett hantverk som kräver precision, lugn och oändlig träning.",personality:["Lugn och disciplinerad","Analytisk och metodisk","Ansvarstagande","Självständig men teamorienterad"],interests:["Flyg och luftfart","Meteorologi och navigation","Teknik och system","Geografi"],like:["Arbeta med avancerad teknik","Ansvar för passagerares säkerhet","Resa och se världen","Lösa navigeringsproblem"],need:["Spatial förmåga","Snabba lugna beslut","Teknisk precision","Fysisk och mental hälsa"]},
+  {keys:["ingenjör","civilingenjör","maskiningenjör","konstruktör"],icon:"⊕",field:"Teknik & Ingenjörskonst",quote:"Ingenjörer löser problem som världen ännu inte vet att den har.",personality:["Analytisk och logisk","Noggrann och systematisk","Nyfiken på hur saker fungerar","Uthållig och lösningsorienterad"],interests:["Matematik och fysik","Teknik och maskiner","Konstruktion","Innovation"],like:["Lösa tekniska problem","Se lösningar bli verklighet","Arbeta med beräkningar","Tvärvetenskapligt samarbete"],need:["Stark matematik och fysik","Analytiskt tänkande","CAD-verktyg","Projektledning"]},
+  {keys:["lärare","pedagog","förskollärare","gymnasielärare","grundskollärare"],icon:"⊕",field:"Utbildning",quote:"En bra lärare förändrar elevens framtid — och ibland hela deras liv.",personality:["Tålmodig och engagerad","Empatisk och lyhörd","Kreativ i undervisning","Inspirerande"],interests:["Inlärning och pedagogik","Barns utveckling","Ämnesdjup","Samhälle och framtid"],like:["Se elever förstå och växa","Förklara komplexa saker enkelt","Bygga relationer med elever","Planera undervisning"],need:["Tydlig kommunikation","Tålamod och empati","Ämneskunskap","Förmåga att motivera"]},
+  {keys:["psykolog","klinisk psykolog","terapeut","kurator"],icon:"⊕",field:"Psykologi",quote:"Att hjälpa någon förstå sig själv bättre är en av de djupaste gåvorna du kan ge.",personality:["Djupt empatisk lyssnare","Analytisk och rigorös","Tålmodig och icke-dömande","Nyfiken på det mänskliga psyket"],interests:["Mänskligt beteende","Psykologi och neurovetenskap","Terapimetoder","Forskning"],like:["Förstå komplexa inre liv","Metodiskt långsiktigt arbete","Tolka mönster","Kombinera vetenskap med värme"],need:["Empati och lyssnande","Analytisk förmåga","Vetenskaplig metodik","Etik"]},
+  {keys:["journalist","reporter","redaktör","frilansjournalist"],icon:"⊕",field:"Journalistik",quote:"Journalister ger röst åt de som inte hörs — och håller makten ansvarig.",personality:["Nyfiken och granskande","Snabb och stresstålig","Modig att ställa svåra frågor","Språklig och kommunikativ"],interests:["Samhällsfrågor","Berättande och skrivande","Källkritik","Digitala medier"],like:["Gräva efter sanningen","Intervjua människor","Publicera under tidstryck","Berätta historier som spelar roll"],need:["Skrivförmåga","Källkritik","Snabba korrekta omdömen","Digital kompetens"]},
+  {keys:["elektriker","VVS","rörmokare","hantverkare","snickare"],icon:"⊕",field:"Hantverk & Bygg",quote:"Hantverkare bygger och underhåller den värld som alla andra tar för given.",personality:["Praktisk och händig","Problemlösande","Noggrann och kvalitetsmedveten","Självständig"],interests:["Teknik och mekanik","Bygg och konstruktion","Elinstallation","Praktisk problemlösning"],like:["Se konkreta resultat","Varierande arbetsplatser","Lösa problem på plats","Självständigt arbete"],need:["Teknisk förståelse","Fysisk koordination","Säkerhetsmedvetenhet","Kundkommunikation"]},
+  {keys:["grafisk designer","formgivare","illustratör","art director"],icon:"⊕",field:"Grafisk design",quote:"Design är aldrig bara hur något ser ut — det handlar om hur det fungerar och vad det säger.",personality:["Visuell och estetisk","Kreativ och idérik","Detaljorienterad","Öppen för feedback"],interests:["Typografi och färglära","Branding","Digitala och tryckta medier","Konsthistoria"],like:["Lösa kommunikationsproblem","Bygga varumärken","Se idéer bli visuella","Kombinera estetik och funktion"],need:["Designprogram","Färgkänsla","Kundkommunikation","Iterationsförmåga"]},
+  {keys:["socialarbetare","socionom","socialtjänst","familjebehandlare"],icon:"⊕",field:"Socialt arbete",quote:"Socialarbetare är samhällets skyddsnät — de finns där när allt annat har brustit.",personality:["Empatisk och tålmodig","Stresstålig","Rättvisekänslig","Lyhörd och icke-dömande"],interests:["Sociala frågor","Barn- och familjefrågor","Psykologi","Lagstiftning"],like:["Göra konkret skillnad","Bygga förtroende","Samarbeta med flera instanser","Komplexa livssituationer"],need:["Empati och uthållighet","Juridisk kunskap","Dokumentation","Professionell distans"]},
+  {keys:["ekonom","revisor","redovisningskonsult","controller","finansanalytiker"],icon:"⊕",field:"Ekonomi",quote:"Bakom varje framgångsrikt företag finns en ekonom som ser till att siffrorna berättar rätt historia.",personality:["Analytisk och logisk","Noggrann","Pålitlig","Strukturerad"],interests:["Siffror och flöden","Affärsutveckling","Redovisning","Investeringar"],like:["Arbeta med data","Skapa ordning","Ge råd som påverkar","Förstå affärer"],need:["Matematisk förmåga","Noggrannhet","Ekonomiska programvaror","Analytiskt tänkande"]},
+  {keys:["miljövetare","miljökonsult","hållbarhetsexpert","klimatforskare","ekolog"],icon:"⊕",field:"Miljö",quote:"Att arbeta för klimatet är att arbeta för varje framtida generation — ingen uppgift är viktigare.",personality:["Passionerad för naturen","Vetenskapligt rigorös","Tålmodig","Kommunikativ"],interests:["Natur och ekologi","Klimatvetenskap","Miljölagstiftning","Dataanalys"],like:["Arbeta utomhus","Analysera miljödata","Påverka politik","Bidra till en hållbar framtid"],need:["Naturvetenskaplig kunskap","GIS och dataanalys","Rapport och kommunikation","Uthållighet"]},
+  {keys:["brandman","brandsoldat","räddningstjänst","brandkår"],icon:"⊕",field:"Räddningstjänst",quote:"Brandmän springer in när alla andra springer ut — mod, träning och laganda.",personality:["Modig och handlingskraftig","Lugn i kaos","Lagspelare","Fysiskt stark"],interests:["Akutinsatser","Brandsläckning","Fysisk träning","Samhällsskydd"],like:["Arbeta i ett tight team","Akuta situationer","Träna och hålla form","Rädda liv"],need:["Hög fysisk kondition","Snabba beslut","Teamwork","Teknisk kompetens"]},
+  {keys:["veterinär","djursjukskötare","veterinärteknik"],icon:"⊕",field:"Veterinärmedicin",quote:"Djur kan inte berätta vad som gör ont — en veterinär måste förstå utan ord.",personality:["Djurälskande och empatisk","Analytisk","Tålmodig och händig","Empatisk mot djurägare"],interests:["Djur och biologi","Veterinärmedicin","Naturvetenskap","Djurbeteende"],like:["Arbeta med djur varje dag","Lösa medicinska gåtor","Stötta djurägare","Kombinera praktik och vetenskap"],need:["Medicinsk kunskap","Handfärdighet","Emotionell uthållighet","Kommunikation"]},
+  {keys:["musiker","artist","sångare","kompositör","producent","låtskrivare"],icon:"⊕",field:"Musik",quote:"Musik är det enda språket alla människor förstår — att skapa det är en gåva och ett kall.",personality:["Kreativ och uttrycksfull","Disciplinerad","Reflekterande","Modig att dela sig"],interests:["Musik i alla genrer","Komposition","Scenkonst","Musikteknik"],like:["Öva och skapa dagligen","Framträda inför publik","Samarbeta med musiker","Uttrycka känslor"],need:["Teknisk musikalisk färdighet","Disciplin","Emotionell mod","Affärssinne"]},
+  {keys:["tandläkare","tandvård","ortodontist"],icon:"⊕",field:"Tandvård",quote:"En tandläkare ger människor självförtroende — ett bra leende förändrar hur någon kliver in i ett rum.",personality:["Precis och detaljfokuserad","Lugn med oroliga patienter","Självständig","Företagsam"],interests:["Anatomi och tandhälsa","Kliniska procedurer","Patientvård","Privat praktik"],like:["Praktiskt precist kliniskt arbete","Långsiktiga patientrelationer","Kombinera vetenskap och estetik","Tydliga resultat"],need:["Handfärdighet","Biologi och kemi","Patientkommunikation","Praktikledning"]},
+  {keys:["apotekare","farmaceut"],icon:"⊕",field:"Farmaci",quote:"En apotekare är sista försvarslinjen innan läkemedlet når patienten — precision räddar liv.",personality:["Detaljorienterad","Pålitlig och lugn","Analytisk","Tillgänglig"],interests:["Kemi och läkemedel","Patientrådgivning","Sjukvårdssystem","Läkemedelsutveckling"],like:["Säkerställa patientsäkerhet","Råd om medicinering","Kombinera vetenskap med interaktion","Strukturerad miljö"],need:["Farmakologisk kunskap","Noggrannhet","Patientkommunikation","Regelkunskap"]},
+  {keys:["marknadsföring","marknadschef","reklam","kampanj"],icon:"⊕",field:"Marknadsföring",quote:"Bra marknadsföring känns inte som marknadsföring — den berättar en historia folk vill vara en del av.",personality:["Kreativ och kommersiellt skarp","Datadriven men intuitiv","Utåtriktad","Anpassningsbar"],interests:["Konsumentpsykologi","Berättande","Digitala plattformar","Kultur och trender"],like:["Lansera kampanjer","Analysera prestanda","Samarbeta över team","Bygga varumärken"],need:["Strategisk kreativitet","Data och analys","Skrivförmåga","Digitala verktyg"]},
+  {keys:["konsult","managementkonsult","strategikonsult"],icon:"⊕",field:"Konsultverksamhet",quote:"Konsulter ser problem som organisationer är för nära för att se själva.",personality:["Analytiskt skarpsinnig","Säker med seniora ledare","Strukturerad tänkare","Anpassningsbar"],interests:["Affärsstrategi","Dataanalys","Organisationsdesign","Finans och ekonomi"],like:["Lösa varierade problem","Presentera analys tydligt","Arbeta i hög takt","Samarbeta med smarta team"],need:["Strukturerad problemlösning","Excel och modellering","Slidebaserat berättande","Projektledning"]}
+],
+es:[
+  {keys:["policía","agente","detective","carabinero"],icon:"⊕",field:"Seguridad y Justicia",quote:"Cada día un agente de policía marca la diferencia para personas reales en situaciones reales — eso es lo que les mueve.",personality:["Calmado y decidido bajo presión","Fuerte sentido de justicia","Empático pero firme","Leal jugador de equipo"],interests:["Seguridad comunitaria","Entrenamiento físico","Criminología","Ley y orden"],like:["Trabajar con personas en momentos difíciles","Días variados e imprevisibles","Tareas física y mentalmente desafiantes","Hacer las comunidades más seguras"],need:["Resistencia física y mental","Comunicación y resolución de conflictos","Trabajo en equipo y liderazgo","Ética y buen juicio"]},
+  {keys:["enfermero","enfermera","enfermería","comadrona","matrona","paramédico"],icon:"⊕",field:"Sanidad",quote:"A menudo eres la persona que los pacientes más recuerdan — no el médico, sino quien les sostuvo la mano.",personality:["Profundamente empático","Calmado en momentos de estrés","Meticuloso y responsable","Motivado por ayudar"],interests:["Ciencia médica","Relaciones humanas","Tecnología sanitaria","Salud pública"],like:["Contacto directo con pacientes","Trabajar en un equipo unido","Decisiones rápidas en momentos críticos","Ver pacientes recuperarse"],need:["Competencia clínica","Resiliencia emocional","Precisión y detalle","Comunicación clara"]},
+  {keys:["médico","doctor","cirujano","médico de cabecera","especialista"],icon:"⊕",field:"Medicina",quote:"La medicina es el arte de combinar ciencia con compasión — cada paciente es un puzzle único.",personality:["Analíticamente curioso","Paciente y metódico","Empático pero profesional","Profundamente comprometido"],interests:["Biología y ciencia médica","Resolución de problemas y diagnóstico","Fisiología humana","Investigación y avance"],like:["Resolver desafíos diagnósticos complejos","Relaciones duraderas con pacientes","Aprendizaje continuo","Marcar diferencias decisivas"],need:["Conocimiento médico profundo","Decisión bajo presión","Comunicación con pacientes","Aprendizaje continuo"]},
+  {keys:["chef","cocinero","panadero","pastelero","jefe de cocina","cocina"],icon:"⊕",field:"Artes Culinarias",quote:"Ver la cara de los comensales al dar el primer bocado a algo que creaste — eso no tiene precio.",personality:["Creativo y sensorial","Resistente y ágil","Perfeccionista con detalle","Apasionado por sabores"],interests:["Cocina y panadería","Productos de calidad","Culturas culinarias","Proceso creativo del menú"],like:["Trabajar con las manos","Servicios intensos","Experimentar con sabores","Comensales satisfechos"],need:["Sentido del gusto","Velocidad y precisión","Tolerancia al estrés","Creatividad con disciplina"]},
+  {keys:["arquitecto","arquitectura","urbanista","paisajista"],icon:"⊕",field:"Arquitectura",quote:"No solo dibujas edificios — creas los lugares donde se desarrolla la vida de las personas.",personality:["Creativo y visual","Analítico y técnico","Paciente con proyectos largos","Colaborativo"],interests:["Forma, espacio y estética","Tecnología y materiales","Planificación urbana","Historia arquitectónica"],like:["Dibujar y visualizar ideas","Combinar arte e ingeniería","Ver proyectos crecer","Trabajar con equipos creativos"],need:["Conciencia espacial","Comprensión técnica","Herramientas CAD","Comunicación con clientes"]},
+  {keys:["piloto","aviador","capitán","copiloto","piloto de helicóptero"],icon:"⊕",field:"Aviación",quote:"Volar es un oficio que exige precisión, calma y dedicación infinita al entrenamiento.",personality:["Calmado y disciplinado","Analíticamente preciso","Profundamente responsable","Independiente pero comprometido"],interests:["Aviación","Meteorología y navegación","Ingeniería avanzada","Geografía"],like:["Tecnología muy avanzada","Responsabilidad por pasajeros","Viajar y conocer países","Resolver desafíos de navegación"],need:["Conciencia espacial","Toma de decisiones bajo presión","Precisión técnica","Salud física y mental"]},
+  {keys:["ingeniero","ingeniería","ingeniero mecánico","ingeniero civil","ingeniero eléctrico"],icon:"⊕",field:"Ingeniería",quote:"Los ingenieros resuelven problemas que el mundo aún no sabe que tiene.",personality:["Analítico y lógico","Meticuloso y sistemático","Curioso por cómo funcionan las cosas","Persistente"],interests:["Matemáticas y física","Tecnología y maquinaria","Construcción","Innovación"],like:["Resolver problemas desde cero","Ver soluciones hechas realidad","Trabajar con cálculos","Equipos multidisciplinarios"],need:["Sólidas matemáticas y física","Pensamiento analítico","Herramientas CAD","Gestión de proyectos"]},
+  {keys:["maestro","maestra","profesor","docente","educador","tutor"],icon:"⊕",field:"Educación",quote:"Un buen maestro cambia el futuro de un alumno — y a veces toda su vida.",personality:["Paciente y comprometido","Empático y sintonizado","Creativo en la enseñanza","Inspirador"],interests:["Ciencias del aprendizaje","Desarrollo infantil","Experiencia en la materia","Sociedad y educación"],like:["Ver a alumnos comprender","Explicar ideas complejas","Construir relaciones","Planificar lecciones"],need:["Comunicación clara","Paciencia y empatía","Conocimiento de la materia","Capacidad de motivar"]},
+  {keys:["psicólogo","psicología","terapeuta","consejero","orientador"],icon:"⊕",field:"Psicología",quote:"Ayudar a alguien a comprenderse mejor a sí mismo es uno de los regalos más profundos que puedes dar.",personality:["Profundamente empático","Analítico y riguroso","Paciente y sin juicios","Profundamente curioso"],interests:["Comportamiento humano","Psicología y neurociencia","Enfoques terapéuticos","Investigación académica"],like:["Comprender vidas interiores","Trabajo metódico a largo plazo","Identificar patrones","Combinar ciencia con calidez"],need:["Empatía y escucha","Pensamiento analítico","Metodología científica","Ética profesional"]},
+  {keys:["periodista","reportero","editor","corresponsal","periodismo"],icon:"⊕",field:"Periodismo",quote:"Los periodistas dan voz a quienes no son escuchados — y piden cuentas al poder.",personality:["Incansablemente curioso","Rápido y tolerante al estrés","Valiente para preguntar","Articulado y persuasivo"],interests:["Política y actualidad","Narración y escritura","Verificación de fuentes","Medios digitales"],like:["Profundizar para encontrar la verdad","Entrevistar a personas","Publicar bajo plazos","Contar historias que importan"],need:["Capacidad de escritura","Crítica de fuentes","Juicio rápido y preciso","Alfabetización digital"]},
+  {keys:["electricista","fontanero","técnico","carpintero","albañil","mecánico"],icon:"⊕",field:"Oficios Técnicos",quote:"Los técnicos de oficios construyen y mantienen el mundo que todos los demás dan por sentado.",personality:["Muy práctico","Ingenioso e inventivo","Consciente del detalle","Fiable y autosuficiente"],interests:["Sistemas técnicos","Construcción","Instalaciones eléctricas","Resolución práctica"],like:["Resultados concretos","Lugares variados","Resolver problemas in situ","Independencia"],need:["Comprensión técnica","Coordinación física","Conciencia de seguridad","Comunicación con clientes"]},
+  {keys:["diseñador gráfico","diseñador","ilustrador","director de arte","artista visual"],icon:"⊕",field:"Diseño Gráfico",quote:"El diseño nunca es solo cómo se ve algo — sino cómo funciona y qué dice.",personality:["Visualmente sensible","Creativo y original","Orientado al detalle","Abierto al feedback"],interests:["Tipografía y color","Identidad de marca","Producción digital e impresa","Historia del arte"],like:["Resolver problemas creativamente","Construir marcas","Ver ideas hechas visuales","Equilibrar estética y función"],need:["Herramientas de diseño","Sensibilidad cromática","Comunicación con clientes","Mentalidad iterativa"]},
+  {keys:["trabajador social","asistente social","servicios sociales","apoyo familiar"],icon:"⊕",field:"Trabajo Social",quote:"Los trabajadores sociales son la red de seguridad de la sociedad — presentes cuando todo lo demás ha fallado.",personality:["Profundamente empático","Resiliente y robusto","Comprometido con la justicia","Sin juicios"],interests:["Problemas sociales","Bienestar familiar","Psicología y comportamiento","Legislación"],like:["Diferencia concreta para vulnerables","Construir confianza","Coordinar con agencias","Situaciones complejas"],need:["Empatía y resistencia","Conocimiento de ley social","Documentación","Límites profesionales"]},
+  {keys:["contable","economista","analista financiero","auditor","banca","finanzas"],icon:"⊕",field:"Finanzas",quote:"Detrás de cada organización exitosa hay alguien que se asegura de que los números cuenten la historia correcta.",personality:["Analíticamente agudo","Meticuloso con detalle","Fiable","Estructurado"],interests:["Números y flujos","Estrategia empresarial","Contabilidad","Inversiones y mercados"],like:["Trabajar con datos","Crear claridad","Proporcionar información clave","Entender los negocios"],need:["Capacidad matemática","Precisión","Software financiero","Pensamiento analítico"]},
+  {keys:["científico ambiental","ecólogo","ambientalista","clima","sostenibilidad","conservación"],icon:"⊕",field:"Medio Ambiente",quote:"Trabajar en el clima es trabajar para cada generación futura — ninguna tarea es más urgente.",personality:["Apasionado por la naturaleza","Científicamente riguroso","Paciente con procesos largos","Comunicador articulado"],interests:["Naturaleza y biodiversidad","Ciencia del clima","Política ambiental","Análisis ambiental"],like:["Trabajar al aire libre","Analizar datos ambientales","Influir en políticas","Futuro sostenible"],need:["Conocimiento científico","SIG y análisis","Comunicación","Resiliencia a largo plazo"]},
+  {keys:["bombero","rescate","emergencias","protección civil"],icon:"⊕",field:"Bomberos y Rescate",quote:"Los bomberos corren hacia el peligro cuando todos los demás huyen — valentía, entrenamiento y equipo.",personality:["Valiente y orientado a la acción","Calmado en el caos","Jugador de equipo","Físicamente fuerte"],interests:["Respuesta a emergencias","Tecnología de extinción","Entrenamiento físico","Protección comunitaria"],like:["Equipo de alta confianza","Situaciones imprevisibles","Entrenamiento físico","Salvar vidas"],need:["Alta aptitud física","Decisiones calmadas","Trabajo en equipo","Competencia técnica"]},
+  {keys:["veterinario","veterinaria","enfermero veterinario","cuidado animal"],icon:"⊕",field:"Medicina Veterinaria",quote:"Los animales no pueden decirte qué les duele — un veterinario debe entender sin palabras.",personality:["Amante de los animales","Analíticamente curioso","Paciente y hábil","Empático con dueños"],interests:["Animales y biología","Medicina veterinaria","Ciencias naturales","Comportamiento animal"],like:["Trabajar con animales","Resolver misterios médicos","Apoyar a dueños","Combinar práctica y ciencia"],need:["Conocimiento veterinario","Destreza manual","Resistencia emocional","Comunicación"]},
+  {keys:["músico","artista","cantante","compositor","productor","cantautor","intérprete"],icon:"⊕",field:"Música",quote:"La música es el único idioma que entiende todo ser humano — crearla es un don y una vocación.",personality:["Profundamente creativo","Disciplinado y dedicado","Reflexivo","Valiente para compartirte"],interests:["Música en todos los géneros","Composición y producción","Actuación en vivo","Tecnología musical"],like:["Practicar y crear a diario","Actuar en vivo","Colaborar con músicos","Expresar emoción"],need:["Habilidad musical técnica","Autodisciplina","Valentía emocional","Sentido empresarial"]},
+  {keys:["dentista","odontólogo","ortodoncista"],icon:"⊕",field:"Odontología",quote:"Un dentista da confianza a las personas — una gran sonrisa cambia cómo alguien entra en una habitación.",personality:["Preciso y detallista","Calmado con pacientes ansiosos","Independiente","Emprendedor"],interests:["Anatomía y salud bucal","Procedimientos clínicos","Atención al paciente","Práctica independiente"],like:["Trabajo clínico preciso","Relaciones duraderas con pacientes","Combinar ciencia y estética","Resultados claros"],need:["Destreza manual","Biología y química","Comunicación con pacientes","Gestión de práctica"]},
+  {keys:["farmacéutico","farmacia"],icon:"⊕",field:"Farmacia",quote:"Un farmacéutico es la última línea de defensa antes de que el medicamento llegue al paciente — la precisión salva vidas.",personality:["Orientado al detalle","Fiable y calmado","Analítico","Accesible"],interests:["Química y medicamentos","Asesoramiento a pacientes","Sistemas sanitarios","Desarrollo farmacéutico"],like:["Garantizar seguridad del paciente","Asesorar sobre medicación","Combinar ciencia con interacción","Entorno estructurado"],need:["Conocimiento farmacológico","Precisión","Comunicación","Conocimiento regulatorio"]},
+  {keys:["marketing","director de marketing","marca","publicidad","campaña"],icon:"⊕",field:"Marketing",quote:"El gran marketing no parece marketing — cuenta una historia de la que la gente quiere formar parte.",personality:["Creativo y comercial","Basado en datos pero intuitivo","Sociable y persuasivo","Adaptable"],interests:["Psicología del consumidor","Narración de marca","Plataformas digitales","Cultura y tendencias"],like:["Lanzar campañas","Analizar rendimiento","Colaborar entre equipos","Construir marcas"],need:["Creatividad estratégica","Datos y análisis","Escritura sólida","Herramientas digitales"]},
+  {keys:["consultor","consultor de gestión","consultor de estrategia"],icon:"⊕",field:"Consultoría",quote:"Los consultores ven los problemas que las organizaciones están demasiado cerca para ver por sí mismas.",personality:["Brillante analíticamente","Confiado con líderes senior","Pensador estructurado","Adaptable"],interests:["Estrategia empresarial","Análisis de datos","Diseño organizacional","Finanzas y economía"],like:["Resolver problemas variados","Presentar análisis","Trabajar a ritmo","Equipos inteligentes"],need:["Resolución estructurada","Excel y modelado","Narración en diapositivas","Gestión de proyectos"]}
+]};
+
+/* ════════════════════════════════════════════════════
+   COUNTRIES — salary multiplier vs EU baseline
+   Multiplier is applied to base €-monthly salary.
+   Currency formatting is per-country.
+════════════════════════════════════════════════════ */
+const Countries = [
+  // code, multiplier vs EU baseline, currency symbol, locale grouping (' ', ',', '.'), position ('before'/'after')
+  { code:"DE", mult:1.10, cur:"€",    sep:".", pos:"before", suffix:"/mo" },
+  { code:"FR", mult:1.00, cur:"€",    sep:" ", pos:"before", suffix:"/mo" },
+  { code:"ES", mult:0.75, cur:"€",    sep:".", pos:"before", suffix:"/mes" },
+  { code:"IT", mult:0.85, cur:"€",    sep:".", pos:"before", suffix:"/mese" },
+  { code:"NL", mult:1.05, cur:"€",    sep:".", pos:"before", suffix:"/mnd" },
+  { code:"BE", mult:1.00, cur:"€",    sep:".", pos:"before", suffix:"/mo" },
+  { code:"SE", mult:1.05, cur:"SEK",  sep:" ", pos:"after",  suffix:"/mån", rateFromEUR:11.5 },
+  { code:"NO", mult:1.20, cur:"NOK",  sep:" ", pos:"after",  suffix:"/mnd", rateFromEUR:11.7 },
+  { code:"DK", mult:1.15, cur:"DKK",  sep:".", pos:"after",  suffix:"/mdr", rateFromEUR:7.5 },
+  { code:"FI", mult:0.95, cur:"€",    sep:" ", pos:"before", suffix:"/kk" },
+  { code:"IE", mult:1.10, cur:"€",    sep:",", pos:"before", suffix:"/mo" },
+  { code:"PT", mult:0.70, cur:"€",    sep:".", pos:"before", suffix:"/mês" },
+  { code:"PL", mult:0.55, cur:"PLN",  sep:" ", pos:"after",  suffix:"/mc", rateFromEUR:4.3 },
+  { code:"CH", mult:1.85, cur:"CHF",  sep:"'", pos:"before", suffix:"/mo", rateFromEUR:0.96 },
+  { code:"UK", mult:1.10, cur:"£",    sep:",", pos:"before", suffix:"/mo", rateFromEUR:0.85 },
+  { code:"US", mult:1.55, cur:"$",    sep:",", pos:"before", suffix:"/mo", rateFromEUR:1.08 },
+  { code:"CA", mult:1.20, cur:"CA$",  sep:",", pos:"before", suffix:"/mo", rateFromEUR:1.45 },
+  { code:"AU", mult:1.30, cur:"A$",   sep:",", pos:"before", suffix:"/mo", rateFromEUR:1.62 },
+  { code:"NZ", mult:1.10, cur:"NZ$",  sep:",", pos:"before", suffix:"/mo", rateFromEUR:1.78 },
+  { code:"MX", mult:0.30, cur:"MX$",  sep:",", pos:"before", suffix:"/mes", rateFromEUR:19 },
+  { code:"BR", mult:0.35, cur:"R$",   sep:".", pos:"before", suffix:"/mês", rateFromEUR:5.5 },
+  { code:"AR", mult:0.30, cur:"AR$",  sep:".", pos:"before", suffix:"/mes", rateFromEUR:1100 },
+  { code:"CL", mult:0.55, cur:"CL$",  sep:".", pos:"before", suffix:"/mes", rateFromEUR:1000 },
+  { code:"CO", mult:0.32, cur:"COL$", sep:".", pos:"before", suffix:"/mes", rateFromEUR:4200 },
+  { code:"JP", mult:1.05, cur:"¥",    sep:",", pos:"before", suffix:"/mo", rateFromEUR:165 },
+  { code:"SG", mult:1.40, cur:"S$",   sep:",", pos:"before", suffix:"/mo", rateFromEUR:1.45 },
+  { code:"AE", mult:1.30, cur:"AED",  sep:",", pos:"after",  suffix:"/mo", rateFromEUR:3.95 },
+  { code:"IN", mult:0.18, cur:"₹",    sep:",", pos:"before", suffix:"/mo", rateFromEUR:90 },
+  { code:"ZA", mult:0.35, cur:"R",    sep:" ", pos:"before", suffix:"/mo", rateFromEUR:20 },
+  { code:"OTHER", mult:1.00, cur:"€", sep:".", pos:"before", suffix:"/mo" },
+];
+
+// Country names per language
+const CountryNames = {
+  en: {DE:"Germany",FR:"France",ES:"Spain",IT:"Italy",NL:"Netherlands",BE:"Belgium",SE:"Sweden",NO:"Norway",DK:"Denmark",FI:"Finland",IE:"Ireland",PT:"Portugal",PL:"Poland",CH:"Switzerland",UK:"United Kingdom",US:"United States",CA:"Canada",AU:"Australia",NZ:"New Zealand",MX:"Mexico",BR:"Brazil",AR:"Argentina",CL:"Chile",CO:"Colombia",JP:"Japan",SG:"Singapore",AE:"United Arab Emirates",IN:"India",ZA:"South Africa",OTHER:"Other / Not listed"},
+  sv: {DE:"Tyskland",FR:"Frankrike",ES:"Spanien",IT:"Italien",NL:"Nederländerna",BE:"Belgien",SE:"Sverige",NO:"Norge",DK:"Danmark",FI:"Finland",IE:"Irland",PT:"Portugal",PL:"Polen",CH:"Schweiz",UK:"Storbritannien",US:"USA",CA:"Kanada",AU:"Australien",NZ:"Nya Zeeland",MX:"Mexiko",BR:"Brasilien",AR:"Argentina",CL:"Chile",CO:"Colombia",JP:"Japan",SG:"Singapore",AE:"Förenade Arabemiraten",IN:"Indien",ZA:"Sydafrika",OTHER:"Annat / Ej listat"},
+  es: {DE:"Alemania",FR:"Francia",ES:"España",IT:"Italia",NL:"Países Bajos",BE:"Bélgica",SE:"Suecia",NO:"Noruega",DK:"Dinamarca",FI:"Finlandia",IE:"Irlanda",PT:"Portugal",PL:"Polonia",CH:"Suiza",UK:"Reino Unido",US:"Estados Unidos",CA:"Canadá",AU:"Australia",NZ:"Nueva Zelanda",MX:"México",BR:"Brasil",AR:"Argentina",CL:"Chile",CO:"Colombia",JP:"Japón",SG:"Singapur",AE:"Emiratos Árabes Unidos",IN:"India",ZA:"Sudáfrica",OTHER:"Otro / No listado"},
+};
+
+let selectedCountry = "OTHER"; // default
+
+/* ════════════════════════════════════════════════════
+   SALARY PARSER & FORMATTER
+   Reads "€2,800–€4,500 / mo" or "€2 800–€4 500 / mån"
+   or "€2.800–€4.500 / mes" → [2800, 4500]
+   Then applies multiplier + currency rate + formats output.
+════════════════════════════════════════════════════ */
+function parseSalaryEUR(salaryStr) {
+  // Handle special non-numeric values
+  if (!/\d/.test(salaryStr)) return null;
+  // Strip everything except digits, separator-and-dash markers
+  const cleaned = salaryStr.replace(/[€$£¥₹]/g, '').replace(/\s/g, '').replace(/\./g, '').replace(/,/g, '');
+  // Split on en-dash or hyphen
+  const parts = cleaned.split(/[–-]/);
+  if (parts.length < 2) return null;
+  const lo = parseInt(parts[0].match(/\d+/)?.[0]);
+  const hi = parseInt(parts[1].match(/\d+/)?.[0]);
+  if (isNaN(lo) || isNaN(hi)) return null;
+  return [lo, hi];
+}
+
+function formatNumber(n, sep) {
+  // Round to nearest 100 for cleanliness on large numbers, nearest 10 otherwise
+  if (n >= 100000) n = Math.round(n / 1000) * 1000;
+  else if (n >= 10000) n = Math.round(n / 100) * 100;
+  else if (n >= 1000) n = Math.round(n / 50) * 50;
+  const str = String(n);
+  // Insert thousand separators
+  if (n < 1000) return str;
+  return str.replace(/\B(?=(\d{3})+(?!\d))/g, sep);
+}
+
+function formatSalaryForCountry(salaryStr) {
+  const variableLabels = {
+    en: "Variable", sv: "Varierar", es: "Variable"
+  };
+  // Handle "Variable" type entries (entrepreneur, musician)
+  if (!parseSalaryEUR(salaryStr)) return variableLabels[lang] || "Variable";
+
+  const [lo, hi] = parseSalaryEUR(salaryStr);
+  const c = Countries.find(x => x.code === selectedCountry) || Countries[Countries.length - 1];
+
+  // Apply multiplier
+  const loEUR = lo * c.mult;
+  const hiEUR = hi * c.mult;
+
+  // Convert to local currency
+  const rate = c.rateFromEUR || 1;
+  const loLocal = loEUR * rate;
+  const hiLocal = hiEUR * rate;
+
+  const loStr = formatNumber(loLocal, c.sep);
+  const hiStr = formatNumber(hiLocal, c.sep);
+
+  // Build the formatted string
+  if (c.pos === 'before') {
+    return `${c.cur}${loStr}–${c.cur}${hiStr} ${c.suffix}`;
+  } else {
+    return `${loStr}–${hiStr} ${c.cur} ${c.suffix}`;
+  }
+}
+
+/* ════════════════════════════════════════════════════
+   IMAGE LOOKUP — primary-tag based, shared across languages
+════════════════════════════════════════════════════ */
+const ImageByTag = {
+  nursing:    "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=600&q=80",
+  medicine:   "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=600&q=80",
+  emergency:  "https://images.unsplash.com/photo-1587556938118-90336854ddc0?w=600&q=80",
+  counselling:"https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=600&q=80",
+  health:     "https://images.unsplash.com/photo-1559757175-5700dde675bc?w=600&q=80",
+  psychology: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=600&q=80",
+  police:     "https://images.unsplash.com/photo-1453873531674-2151bcd01707?w=600&q=80",
+  detective:  "https://images.unsplash.com/photo-1453873531674-2151bcd01707?w=600&q=80",
+  law:        "https://images.unsplash.com/photo-1589994965851-a8f479c573a9?w=600&q=80",
+  justice:    "https://images.unsplash.com/photo-1589994965851-a8f479c573a9?w=600&q=80",
+  social:     "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=600&q=80",
+  teaching:   "https://images.unsplash.com/photo-1577896851231-70ef18881754?w=600&q=80",
+  education:  "https://images.unsplash.com/photo-1577896851231-70ef18881754?w=600&q=80",
+  research:   "https://images.unsplash.com/photo-1581093588401-fbb62a02f120?w=600&q=80",
+  tech:       "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&q=80",
+  AI:         "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=600&q=80",
+  digital:    "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&q=80",
+  design:     "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&q=80",
+  art:        "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&q=80",
+  architecture:"https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&q=80",
+  engineering:"https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=600&q=80",
+  STEM:       "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80",
+  trade:      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=600&q=80",
+  construction:"https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80",
+  environment:"https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=600&q=80",
+  finance:    "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&q=80",
+  business:   "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=600&q=80",
+  entrepreneurship:"https://images.unsplash.com/photo-1556761175-b413da4baf72?w=600&q=80",
+  journalism: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=80",
+  writing:    "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&q=80",
+  food:       "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&q=80",
+  animals:    "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=600&q=80",
+  active:     "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=600&q=80",
+  safety:     "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80",
+  music:      "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=600&q=80",
+  fieldwork:  "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80",
+};
+
+const DefaultImg = "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=600&q=80";
+
+function getImageForCareer(career) {
+  for (const tag of career.tags) {
+    if (ImageByTag[tag]) return ImageByTag[tag];
+  }
+  return DefaultImg;
+}
+
+/* ════════════════════════════════════════════════════
+   STATE & LOGIC
+════════════════════════════════════════════════════ */
+let lang = 'en';
+let qIdx = 0;
+let answers = [];     // tags array per question, used for back navigation
+let picked = null;
+let scores = {};
+
+function setLang(l) {
+  lang = l;
+  document.documentElement.lang = l;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`).classList.add('active');
+  applyUI();
+  const active = document.querySelector('.screen.active')?.id;
+  if (active === 's-question') renderQ();
+  if (active === 's-results') renderResults(true);
+}
+
+function applyUI() {
+  const t = UI[lang];
+  document.getElementById('hero-eyebrow').textContent = t.eyebrow;
+  document.getElementById('hero-title').innerHTML    = t.title;
+  document.getElementById('hero-lead').textContent   = t.lead;
+  document.getElementById('hero-cta').textContent    = t.cta;
+  document.getElementById('hero-cta2').textContent   = t.cta2;
+  document.getElementById('hero-meta-1').textContent = t.meta1;
+  document.getElementById('hero-meta-2').textContent = t.meta2;
+  document.getElementById('hero-meta-3').textContent = t.meta3;
+  document.getElementById('cap-1').textContent = t.cap1;
+  document.getElementById('cap-2').textContent = t.cap2;
+  document.getElementById('cap-3').textContent = t.cap3;
+  document.getElementById('cap-4').textContent = t.cap4;
+  document.getElementById('country-eyebrow').textContent = t.countryEyebrow;
+  document.getElementById('country-title').innerHTML = t.countryTitle;
+  document.getElementById('country-lead').textContent = t.countryLead;
+  document.getElementById('country-label-text').textContent = t.countryLabel;
+  document.getElementById('country-note').textContent = t.countryNote;
+  document.getElementById('country-cta').textContent = t.countryCta;
+  document.getElementById('country-back').textContent = t.countryBack;
+  populateCountrySelect();
+  document.getElementById('method-title').textContent = t.methodTitle;
+  document.getElementById('method-1-h').textContent = t.method1H;
+  document.getElementById('method-1-p').textContent = t.method1P;
+  document.getElementById('method-2-h').textContent = t.method2H;
+  document.getElementById('method-2-p').textContent = t.method2P;
+  document.getElementById('method-3-h').textContent = t.method3H;
+  document.getElementById('method-3-p').textContent = t.method3P;
+  document.getElementById('loading-h').textContent  = t.loadingH;
+  document.getElementById('res-eyebrow').textContent = t.resEyebrow;
+  document.getElementById('res-title').innerHTML   = t.resTitle;
+  document.getElementById('res-lead').textContent  = t.resLead;
+  document.getElementById('section-matches').textContent = t.sectionMatches;
+  document.getElementById('explorer-num-label').textContent = t.explorerNum;
+  document.getElementById('explorer-h').innerHTML  = t.explorerH;
+  document.getElementById('explorer-p').textContent = t.explorerP;
+  document.getElementById('ex-input').placeholder  = t.exPlaceholder;
+  document.getElementById('ex-btn').textContent    = t.exBtn;
+  document.getElementById('q-next').textContent    = t.continueBtn;
+  document.getElementById('back-label').textContent = t.backLabel;
+  document.getElementById('footer-text').innerHTML = t.footerText;
+  document.getElementById('restart-btn').textContent = t.restart;
+  document.getElementById('ex-result').className = 'er-result';
+  document.getElementById('ex-result').innerHTML = '';
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  el.classList.add('active');
+  el.style.animation = 'none'; el.offsetHeight; el.style.animation = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function scrollToMethod() {
+  document.getElementById('method-strip').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function startQuiz() {
+  qIdx = 0; scores = {}; picked = null; answers = [];
+  showScreen('s-country');
+}
+
+function confirmCountry() {
+  renderQ();
+  showScreen('s-question');
+}
+
+function onCountryChange() {
+  selectedCountry = document.getElementById('country-select').value;
+}
+
+function populateCountrySelect() {
+  const sel = document.getElementById('country-select');
+  const names = CountryNames[lang];
+  // Build list, separating "OTHER" to end
+  const sorted = Countries
+    .filter(c => c.code !== 'OTHER')
+    .map(c => ({ code: c.code, name: names[c.code] }))
+    .sort((a, b) => a.name.localeCompare(b.name, lang));
+  sel.innerHTML = '';
+  sorted.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.code; opt.textContent = c.name;
+    if (c.code === selectedCountry) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  // Add OTHER at the end
+  const otherOpt = document.createElement('option');
+  otherOpt.value = 'OTHER'; otherOpt.textContent = names['OTHER'];
+  if (selectedCountry === 'OTHER') otherOpt.selected = true;
+  sel.appendChild(otherOpt);
+}
+
+function renderQ() {
+  const t = UI[lang];
+  const q = Qs[lang][qIdx];
+  document.getElementById('q-domain').textContent = q.cat;
+  document.getElementById('q-prompt').textContent = q.txt;
+  document.getElementById('q-step').innerHTML = t.questionOf(qIdx + 1, Qs[lang].length);
+  document.getElementById('q-next').textContent = t.continueBtn;
+  document.getElementById('back-label').textContent = t.backLabel;
+
+  const pct = Math.round(qIdx / Qs[lang].length * 100);
+  document.getElementById('q-progress').style.width = pct + '%';
+  document.getElementById('q-pct').textContent = pct + '%';
+
+  // back button disabled on first question
+  document.getElementById('q-back').disabled = qIdx === 0;
+
+  const list = document.getElementById('q-options');
+  list.innerHTML = '';
+  q.opts.forEach(o => {
+    const b = document.createElement('button');
+    b.className = 'q-opt';
+    b.innerHTML = `<span class="q-opt-marker"></span>
+      <div class="q-opt-body">
+        <div class="q-opt-label">${o.l}</div>
+        <div class="q-opt-desc">${o.d}</div>
+      </div>`;
+    b.onclick = () => {
+      picked = o.t;
+      list.querySelectorAll('.q-opt').forEach(x => x.classList.remove('sel'));
+      b.classList.add('sel');
+      document.getElementById('q-next').disabled = false;
+    };
+    list.appendChild(b);
+  });
+
+  // restore previous answer if revisiting
+  picked = answers[qIdx] || null;
+  if (picked) {
+    // find matching option button and mark it
+    const optElements = list.querySelectorAll('.q-opt');
+    const optsData = Qs[lang][qIdx].opts;
+    const idx = optsData.findIndex(o => o.t === picked);
+    if (idx >= 0) optElements[idx]?.classList.add('sel');
+    document.getElementById('q-next').disabled = false;
+  } else {
+    document.getElementById('q-next').disabled = true;
+  }
+}
+
+function nextQ() {
+  if (!picked) return;
+  // if revisiting, decrement old answer scores first
+  if (answers[qIdx]) {
+    answers[qIdx].forEach(tag => { scores[tag] = (scores[tag] || 1) - 1; });
+  }
+  answers[qIdx] = picked;
+  picked.forEach(tag => { scores[tag] = (scores[tag] || 0) + 1; });
+  qIdx++;
+  if (qIdx < Qs[lang].length) renderQ();
+  else { showScreen('s-loading'); setTimeout(() => renderResults(false), 1600); }
+}
+
+function prevQ() {
+  if (qIdx === 0) return;
+  qIdx--;
+  renderQ();
+}
+
+function renderResults(rerender) {
+  const t = UI[lang];
+  const careers = Careers[lang];
+  const ranked = careers.map(c => {
+    let s = 0; c.tags.forEach(tag => { if (scores[tag]) s += scores[tag]; }); return { ...c, s };
+  }).sort((a, b) => b.s - a.s);
+
+  const top3 = ranked.slice(0, 3);
+  const list = document.getElementById('career-list');
+  list.innerHTML = '';
+
+  top3.forEach((c, i) => {
+    const num = String(i + 1).padStart(2, '0');
+    const labelMap = ['Best match', 'Strong match', 'Great alternative'];
+    const labelMapSv = ['Bästa matchning', 'Stark matchning', 'Bra alternativ'];
+    const labelMapEs = ['Mejor coincidencia', 'Gran coincidencia', 'Buena alternativa'];
+    const labels = lang === 'sv' ? labelMapSv : lang === 'es' ? labelMapEs : labelMap;
+
+    const img = getImageForCareer(c);
+    const el = document.createElement('div');
+    el.className = 'career';
+    el.innerHTML = `
+      <div class="career-num">${num} <em>— ${labels[i]}</em></div>
+      <div class="career-row">
+        <div class="career-image-wrap">
+          <img class="career-image" src="${img}" alt="${c.t}" loading="lazy">
+        </div>
+        <div>
+          <h3 class="career-title">${c.t}</h3>
+          <p class="career-desc">${c.desc}</p>
+        </div>
+        <div class="career-stats career-stats-col">
+          <div>
+            <div class="stat-label">${t.salaryLabel}</div>
+            <div class="stat-val">${formatSalaryForCountry(c.salary)}</div>
+          </div>
+          <div>
+            <div class="stat-label">${t.jobLabel}</div>
+            <div class="stat-val">${c.outlook}</div>
+          </div>
+        </div>
+      </div>`;
+    list.appendChild(el);
+  });
+
+  if (!rerender) {
+    document.getElementById('ex-result').className = 'er-result';
+    document.getElementById('ex-result').innerHTML = '';
+    document.getElementById('ex-input').value = '';
+    showScreen('s-results');
+  }
+}
+
+function restart() {
+  showScreen('s-hero');
+}
+
+function explore() {
+  const raw = document.getElementById('ex-input').value.trim().toLowerCase();
+  if (!raw) return;
+  const t = UI[lang];
+  const box = document.getElementById('ex-result');
+  const kb = KB[lang];
+
+  const match = kb.find(entry => entry.keys.some(k => raw.includes(k) || k.includes(raw)));
+
+  if (!match) {
+    box.innerHTML = `<p class="er-none">${t.erNone(raw)}</p>`;
+    box.className = 'er-result show';
+    return;
+  }
+
+  const ul = arr => `<ul>${arr.map(x => `<li>${x}</li>`).join('')}</ul>`;
+  const displayName = match.keys[0].split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
+  box.innerHTML = `
+    <div class="er-header">
+      <span class="er-icon">${match.icon}</span>
+      <h3 class="er-name">${displayName}</h3>
+    </div>
+    <div class="er-field">${match.field}</div>
+    <p class="er-quote">${match.quote}</p>
+    <div class="er-grid">
+      <div class="er-section">
+        <div class="er-section-title">${t.erPersonality}</div>
+        ${ul(match.personality)}
+      </div>
+      <div class="er-section">
+        <div class="er-section-title">${t.erInterests}</div>
+        ${ul(match.interests)}
+      </div>
+      <div class="er-section">
+        <div class="er-section-title">${t.erLike}</div>
+        ${ul(match.like)}
+      </div>
+      <div class="er-section">
+        <div class="er-section-title">${t.erNeed}</div>
+        ${ul(match.need)}
+      </div>
+    </div>`;
+  box.className = 'er-result show';
+  setTimeout(() => box.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+}
+
+// init
+applyUI();
+</script>
+</body>
+</html>
