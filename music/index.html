@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>House of Veyra — Music</title>
+<meta name="description" content="New singles from House of Veyra — listen before they land on streaming.">
+<style>
+  :root{
+    --bg:#080b14; --card:#121826; --card-hi:#1a2236;
+    --gold:#c17a24; --gold-soft:#e8c98a; --cold:#33405f;
+    --text:#f2e8db; --muted:#8a93a8; --line:#212a40;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    line-height:1.55; padding:0 20px;
+  }
+  .wrap{max-width:720px; margin:0 auto; padding:64px 0 96px;}
+  .brand{font-size:13px; letter-spacing:6px; text-transform:uppercase; color:var(--gold); margin:0 0 4px;}
+  .intro{color:var(--muted); font-size:15px; margin:0 0 30px; max-width:52ch;}
+  .playall{
+    display:inline-flex; align-items:center; gap:9px; cursor:pointer;
+    background:var(--gold); color:#20140a; border:none; border-radius:999px;
+    padding:11px 22px; font-size:14px; font-weight:600; letter-spacing:.3px;
+    margin-bottom:26px; transition:filter .15s ease;
+  }
+  .playall:hover{filter:brightness(1.08);}
+  .playall .ic{font-size:12px; line-height:1;}
+  ol.tracks{list-style:none; margin:0; padding:0;}
+  .track{
+    display:flex; align-items:center; gap:16px; padding:12px; border-radius:12px;
+    border:1px solid transparent; transition:background .15s ease;
+  }
+  .track:hover{background:var(--card);}
+  .track.is-active{background:var(--card-hi); border-color:var(--line);}
+  .cover{
+    position:relative; width:116px; height:116px; border-radius:13px; flex:none; overflow:hidden;
+    background:linear-gradient(105deg,var(--cold) 0%,var(--cold) 42%,var(--gold) 100%);
+  }
+  .cover img{width:100%; height:100%; object-fit:cover; display:block;}
+  .cover .play{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    background:rgba(8,11,20,.42); color:#fff; font-size:30px; cursor:pointer;
+    border:none; opacity:0; transition:opacity .15s ease;
+  }
+  .track:hover .cover .play,.track.is-active .cover .play{opacity:1;}
+  .meta{flex:1; min-width:0;}
+  .title{font-size:16px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .sub{font-size:12.5px; color:var(--muted); margin-top:2px;}
+  .track-body{flex:1; min-width:0; display:flex; flex-direction:column; gap:8px;}
+  .progress{height:4px; background:var(--line); border-radius:999px; cursor:pointer; overflow:hidden;}
+  .progress .fill{height:100%; width:0; background:var(--gold); border-radius:999px;}
+  .times{display:flex; justify-content:space-between; font-size:11.5px; color:var(--muted);
+    font-variant-numeric:tabular-nums;}
+  .foot{margin-top:44px; color:var(--muted); font-size:13px; border-top:1px solid var(--line); padding-top:22px;}
+  .foot .soon{color:var(--gold-soft); letter-spacing:1px;}
+  @media (max-width:520px){
+    .wrap{padding:44px 0 72px;} .cover{width:92px; height:92px;} .times{font-size:11px;}
+    .track{gap:13px; padding:10px;} .cover .play{opacity:1; font-size:26px; background:rgba(8,11,20,.30);}
+  }
+  @media (prefers-reduced-motion:reduce){ *{transition:none !important;} }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <p class="brand">House of Veyra</p>
+  <p class="intro">New music, here first. Have a listen below — full release landing on streaming soon.</p>
+
+  <button id="playall" class="playall" type="button">
+    <span class="ic">&#9654;</span><span class="lbl">Play all</span>
+  </button>
+
+  <ol class="tracks" id="tracks"></ol>
+
+  <div class="foot">
+    <p class="soon">Coming soon to Spotify &amp; Apple Music</p>
+    <p>Music: House of Veyra · created with Suno</p>
+  </div>
+</main>
+
+<script>
+/* ---------------------------------------------------------------
+   Track list. New releases first.
+   src/cover use absolute /music/ paths so they resolve wherever
+   this page lives.  NOTE: the 8 existing tracks assume the audio
+   file shares the same slug as the cover (e.g. stockholm.jpg ->
+   stockholm.mp3). If any existing .mp3 has a different name, fix
+   its `src` below — the 3 new tracks are already correct.
+--------------------------------------------------------------- */
+const TRACKS = [
+  // --- NEW ---
+  { title:"Time is short, yet so long", sub:"",
+    src:"/music/time-is-short_yet-so-long.mp3",       cover:"/music/time-is-short_yet-so-long.jpg" },
+  { title:"Time is short, yet so long", sub:"Ibiza Sunset Mix",
+    src:"/music/time-is-short_yet-so-long---ibiza.mp3", cover:"/music/time-is-short_yet-so-long---ibiza.jpg" },
+  { title:"El tiempo es corto, y tan largo", sub:"En español",
+    src:"/music/el-tiempo-es-corto_y-tan-largo.mp3",  cover:"/music/el-tiempo-es-corto_y-tan-largo.jpg" },
+  // --- EXISTING ---
+  { title:"Stockholm", sub:"",                  src:"/music/stockholm.mp3",               cover:"/music/stockholm.jpg" },
+  { title:"I'm Losing My Mind", sub:"",         src:"/music/im-losing-my-mind.mp3",       cover:"/music/im-losing-my-mind.jpg" },
+  { title:"I'm Losing My Mind", sub:"Ibiza Sunset Mix", src:"/music/im-losing-my-mind-ibiza.mp3", cover:"/music/im-losing-my-mind-ibiza.jpg" },
+  { title:"Beautiful", sub:"",                  src:"/music/beautiful.mp3",               cover:"/music/beautiful.jpg" },
+  { title:"You Light Me Up Like Fire", sub:"",  src:"/music/you-light-me-up-like-fire.mp3", cover:"/music/you-light-me-up-like-fire.jpg" },
+  { title:"Como el fuego", sub:"En español",    src:"/music/como-el-fuego.mp3",           cover:"/music/como-el-fuego.jpg" },
+  { title:"Harder to Stay", sub:"",             src:"/music/harder-to-stay.mp3",          cover:"/music/harder-to-stay.jpg" },
+  { title:"Quedarse duele más", sub:"En español", src:"/music/quedarse-duele-mas.mp3",   cover:"/music/quedarse-duele-mas.jpg" },
+  { title:"The day is closer than you think", sub:"", src:"/music/the-day-is-closer-than-you-think.mp3", cover:"/music/the-day-is-closer-than-you-think.jpg" },
+  { title:"Våra minnen är det som finns kvar", sub:"På svenska", src:"/music/va_ra-minnen-a_r-det-som-finns-kvar.mp3", cover:"/music/va_ra-minnen-a_r-det-som-finns-kvar.jpg" },
+];
+
+const listEl = document.getElementById("tracks");
+const playAll = document.getElementById("playall");
+const paIc = playAll.querySelector(".ic");
+const paLbl = playAll.querySelector(".lbl");
+const audios = [];
+let current = -1, chaining = false;
+
+const fmt = s => isNaN(s) ? "0:00" : Math.floor(s/60)+":"+String(Math.floor(s%60)).padStart(2,"0");
+
+TRACKS.forEach((t, i) => {
+  const li = document.createElement("li");
+  li.className = "track"; li.dataset.i = i;
+  li.innerHTML = `
+    <div class="cover">
+      ${t.cover ? `<img src="${t.cover}" alt="${t.title} cover art" loading="lazy">` : ``}
+      <button class="play" type="button" aria-label="Play ${t.title}">&#9654;</button>
+    </div>
+    <div class="track-body">
+      <div class="meta">
+        <div class="title">${t.title}</div>
+        ${t.sub ? `<div class="sub">${t.sub}</div>` : ``}
+      </div>
+      <div class="progress" data-i="${i}"><div class="fill"></div></div>
+      <div class="times"><span class="cur">0:00</span><span class="dur">—:—</span></div>
+    </div>
+    <audio preload="metadata" src="${t.src}"></audio>`;
+  listEl.appendChild(li);
+
+  const audio = li.querySelector("audio");
+  const fill  = li.querySelector(".fill");
+  const cur   = li.querySelector(".cur");
+  const dur   = li.querySelector(".dur");
+  const prog  = li.querySelector(".progress");
+  const playBtn = li.querySelector(".cover .play");
+  audios.push(audio);
+
+  const toggle = () => { audio.paused ? audio.play().catch(()=>{}) : audio.pause(); };
+  playBtn.addEventListener("click", toggle);
+
+  audio.addEventListener("loadedmetadata", () => dur.textContent = fmt(audio.duration));
+  audio.addEventListener("timeupdate", () => {
+    if (audio.duration) { fill.style.width = (audio.currentTime/audio.duration*100)+"%"; cur.textContent = fmt(audio.currentTime); }
+  });
+  audio.addEventListener("play", () => {
+    current = i;
+    audios.forEach(a => { if (a !== audio) a.pause(); });
+    document.querySelectorAll(".track").forEach(r => r.classList.toggle("is-active", +r.dataset.i === i));
+    playBtn.innerHTML = "&#10073;&#10073;"; paIc.innerHTML = "&#10073;&#10073;"; paLbl.textContent = "Pause";
+  });
+  audio.addEventListener("pause", () => {
+    playBtn.innerHTML = "&#9654;";
+    if (audios.every(a => a.paused)) { paIc.innerHTML = "&#9654;"; paLbl.textContent = "Play all"; }
+  });
+  audio.addEventListener("ended", () => {
+    playBtn.innerHTML = "&#9654;";
+    if (chaining && i < TRACKS.length-1) audios[i+1].play().catch(()=>{});
+    else chaining = false;
+  });
+  prog.addEventListener("click", e => {
+    if (!audio.duration) return;
+    const r = prog.getBoundingClientRect();
+    audio.currentTime = (e.clientX - r.left)/r.width * audio.duration;
+  });
+});
+
+playAll.addEventListener("click", () => {
+  if (current >= 0 && !audios[current].paused) { audios[current].pause(); return; }
+  chaining = true;
+  audios[current < 0 ? 0 : current].play().catch(()=>{});
+});
+</script>
+</body>
+</html>
