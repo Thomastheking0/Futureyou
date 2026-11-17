@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FutureYou Life</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Caveat:wght@500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#13271F; --surface:#1B352A; --ink:#EFE9D8; --muted:#9BB1A2;
+  --line:#2F4D3E; --line-soft:#243F32;
+  --fir:#C9A24B; --fir-soft:#2E4A3A; --amber:#C8824E; --amber-soft:#3A2C1D;
+  --bar:#C9A24B; --bar-track:#0E1F18;
+  color-scheme:dark;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0C1A14; --surface:#132620; --ink:#ECE6D4; --muted:#8CA294;
+    --line:#253C30; --line-soft:#1C2F26;
+    --fir:#D4B05E; --fir-soft:#2C4737; --amber:#D68F5B; --amber-soft:#33271A;
+    --bar:#D4B05E; --bar-track:#081109;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0C1A14; --surface:#132620; --ink:#ECE6D4; --muted:#8CA294;
+  --line:#253C30; --line-soft:#1C2F26;
+  --fir:#D4B05E; --fir-soft:#2C4737; --amber:#D68F5B; --amber-soft:#33271A;
+  --bar:#D4B05E; --bar-track:#081109;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{height:100%}
+*,*::before,*::after{box-sizing:inherit}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font:400 16px/1.55 "Archivo",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:40}
+h1,h2,h3,.num{font-family:"Fraunces",Georgia,serif;font-weight:500;letter-spacing:-0.01em}
+h1{font-size:1.5rem;margin:0}
+h2{font-size:1.35rem;margin:0 0 .35rem}
+h3{font-size:1.05rem;margin:0 0 .25rem}
+p{margin:.35rem 0 .9rem}
+a{color:var(--fir)}
+.wrap{max-width:1020px;margin:0 auto;padding:0 20px}
+header.app{
+  position:sticky;top:env(safe-area-inset-top,0px);z-index:30;
+  background:var(--bg);border-bottom:1px solid var(--line);
+}
+.masthead{display:flex;align-items:center;gap:14px;padding:16px 0 10px;flex-wrap:wrap}
+.wordmark{display:inline-flex;align-items:center;gap:11px}
+.fy-mark{width:36px;height:36px;flex-shrink:0;display:block;transition:transform .3s ease}
+.wordmark:hover .fy-mark{transform:rotate(-4deg) scale(1.05)}
+.brand-text{display:inline-flex;align-items:baseline;gap:8px;line-height:1}
+.brand-name{font-family:"Fraunces",Georgia,serif;font-size:1.35rem;font-weight:500;letter-spacing:-.02em;color:var(--ink);font-variation-settings:"opsz" 144}
+.wordmark .life{font-family:"Caveat",cursive;font-size:1.7rem;font-weight:600;color:var(--fir);letter-spacing:-.01em;transform:translateY(2px) rotate(-2deg);transform-origin:left bottom}
+.tagline{color:var(--muted);font-size:.86rem}
+.mast-right{margin-left:auto;display:flex;align-items:center;gap:14px}
+nav.tabs{display:flex;gap:2px;overflow-x:auto;padding-bottom:0;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs button{
+  appearance:none;border:0;background:none;color:var(--muted);
+  font:500 .92rem "Archivo",sans-serif;padding:10px 14px;cursor:pointer;
+  border-bottom:2px solid transparent;white-space:nowrap;
+}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--fir)}
+nav.tabs button:focus-visible{outline:2px solid var(--fir);outline-offset:-2px;border-radius:4px}
+main{padding:26px 0 70px}
+section.view{display:none}
+section.view.active{display:block}
+.lede{color:var(--muted);max-width:62ch}
+
+/* Ledger */
+.ledger{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin:18px 0}
+.ledger .group{padding:14px 18px 6px;border-top:1px solid var(--line-soft)}
+.ledger .group:first-child{border-top:0}
+.ledger .group-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.ledger .group-head h3{color:var(--fir)}
+.ledger .group-head .num{font-size:1.05rem}
+.row{display:grid;grid-template-columns:minmax(120px,190px) 1fr 86px;gap:12px;align-items:center;padding:7px 0}
+.row .label{font-size:.92rem}
+.row .label small{display:block;color:var(--muted);font-size:.78rem}
+.bullet{position:relative;height:14px;background:var(--bar-track);border-radius:7px}
+.bullet .fill{position:absolute;inset:0 auto 0 0;background:var(--bar);border-radius:7px;min-width:4px}
+.bullet .tick{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--amber);border-radius:1px}
+.row .figs{text-align:right;font-size:.85rem;color:var(--muted);white-space:nowrap}
+.row .figs b{color:var(--ink);font-weight:600}
+.row.constraint .label{color:var(--amber);font-weight:600}
+.badge{display:inline-block;font-size:.72rem;font-weight:600;color:var(--amber);background:var(--amber-soft);border-radius:4px;padding:1px 7px;margin-left:6px;vertical-align:1px}
+
+/* Domain definition tooltips */
+.info{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;border:1px solid var(--muted);color:var(--muted);font:600 .62rem "Archivo",sans-serif;font-style:normal;margin-left:7px;cursor:help;position:relative;vertical-align:1px;user-select:none}
+.info:hover,.info:focus,.info.open{border-color:var(--fir);color:var(--fir);outline:none}
+.info::after{content:attr(data-tip);position:absolute;left:0;top:calc(100% + 8px);z-index:60;width:min(250px,72vw);background:var(--bg);border:1px solid var(--line);color:var(--ink);font:400 .78rem/1.5 "Archivo",sans-serif;padding:9px 12px;border-radius:8px;box-shadow:0 8px 22px rgba(0,0,0,.4);opacity:0;visibility:hidden;transition:opacity .12s;pointer-events:none;text-align:left;white-space:normal}
+.info:hover::after,.info:focus::after,.info.open::after{opacity:1;visibility:visible}
+
+/* Cards + forms */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;margin:16px 0}
+.panel.flash{border-color:var(--fir)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}.row{grid-template-columns:minmax(100px,150px) 1fr 76px}}
+label.f{display:block;font-size:.84rem;font-weight:500;color:var(--muted);margin:10px 0 4px}
+input[type=text],input[type=date],textarea,select{
+  width:100%;border:1px solid var(--line);border-radius:7px;background:var(--bg);
+  color:var(--ink);font:400 .95rem "Archivo",sans-serif;padding:9px 11px;
+}
+textarea{min-height:70px;resize:vertical}
+input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--fir);outline-offset:1px}
+.btn{
+  appearance:none;border:1px solid var(--fir);background:var(--fir);color:#142A21;
+  font:600 .92rem "Archivo",sans-serif;border-radius:8px;padding:10px 18px;cursor:pointer;
+}
+.btn.secondary{background:none;color:var(--fir)}
+.btn.small{padding:6px 12px;font-size:.84rem}
+.btn:disabled{opacity:.45;cursor:default}
+.hint{font-size:.82rem;color:var(--muted)}
+.ok{color:var(--fir);font-size:.86rem;font-weight:500}
+
+/* Assess sliders */
+.slider-row{display:grid;grid-template-columns:minmax(130px,200px) 1fr 46px;gap:14px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line-soft)}
+.slider-row:last-child{border-bottom:0}
+.slider-row .num{font-size:1.15rem;text-align:right;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--fir);height:28px}
+.group-title{margin:18px 0 4px;color:var(--fir)}
+
+/* Strategy */
+.ranklist{list-style:none;margin:10px 0;padding:0}
+.ranklist li{display:grid;grid-template-columns:auto 1fr auto auto;gap:12px;align-items:center;padding:10px 4px;border-bottom:1px solid var(--line-soft)}
+.ranklist li:last-child{border-bottom:0}
+.ranklist .gapnum{font-family:"Fraunces",serif;font-size:1.1rem;color:var(--amber);min-width:44px;text-align:right}
+.pick{display:flex;gap:10px;font-size:.82rem;color:var(--muted)}
+.pick label{display:flex;align-items:center;gap:4px;cursor:pointer}
+.pick input{accent-color:var(--fir)}
+
+/* Plan */
+.activity{display:grid;grid-template-columns:auto 1fr auto auto;gap:12px;align-items:center;padding:9px 4px;border-bottom:1px solid var(--line-soft)}
+.activity:last-child{border-bottom:0}
+.activity input[type=checkbox]{width:19px;height:19px;accent-color:var(--fir)}
+.activity .meta{font-size:.78rem;color:var(--muted);white-space:nowrap}
+.activity .del{background:none;border:0;color:var(--muted);cursor:pointer;font-size:1rem;padding:2px 6px}
+.progress{height:10px;background:var(--bar-track);border-radius:5px;overflow:hidden;margin:8px 0 4px}
+.progress i{display:block;height:100%;background:var(--bar)}
+.statline{display:flex;gap:26px;flex-wrap:wrap;margin:8px 0}
+.statline div .num{font-size:1.7rem;display:block}
+.statline div span{font-size:.8rem;color:var(--muted)}
+
+/* Review */
+table.rev{width:100%;border-collapse:collapse;font-size:.9rem;margin:10px 0}
+table.rev th{text-align:left;font-weight:500;color:var(--muted);font-size:.8rem;border-bottom:1px solid var(--line);padding:6px 8px}
+table.rev td{padding:7px 8px;border-bottom:1px solid var(--line-soft);font-variant-numeric:tabular-nums}
+table.rev td.delta-up{color:var(--fir);font-weight:600}
+table.rev td.delta-down{color:var(--amber);font-weight:600}
+.chartbox{overflow-x:auto}
+.empty{border:1px dashed var(--line);border-radius:10px;padding:34px 22px;text-align:center;color:var(--muted);margin:18px 0}
+.notice{font-size:.82rem;color:var(--muted);border-top:1px solid var(--line-soft);margin-top:22px;padding-top:12px}
+footer{color:var(--muted);font-size:.8rem;padding:18px 0 30px;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<header class="app">
+  <div class="wrap">
+    <div class="masthead">
+      <span class="wordmark" id="brandmark">
+        <span class="fy-mark" aria-hidden="true">
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:100%">
+            <circle cx="50" cy="50" r="48" fill="var(--surface)" stroke="var(--fir)" stroke-width="3"/>
+            <text x="50" y="62" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-size="42" font-weight="500" fill="var(--fir)" letter-spacing="-1" font-style="italic">FY</text>
+            <line x1="38" y1="72" x2="62" y2="72" stroke="var(--fir)" stroke-width="1" opacity="0.7"/>
+          </svg>
+        </span>
+        <span class="brand-text"><span class="brand-name">FutureYou</span><span class="life">Life</span></span>
+      </span>
+      <span class="tagline" id="tagline"></span>
+      <span class="mast-right">
+        <span id="syncState" class="tagline"></span>
+      </span>
+    </div>
+    <nav class="tabs" role="tablist" id="tabs">
+      <button role="tab" data-v="overview" aria-selected="true"></button>
+      <button role="tab" data-v="assess" aria-selected="false"></button>
+      <button role="tab" data-v="position" aria-selected="false"></button>
+      <button role="tab" data-v="strategy" aria-selected="false"></button>
+      <button role="tab" data-v="plan" aria-selected="false"></button>
+      <button role="tab" data-v="review" aria-selected="false"></button>
+      <button role="tab" data-v="about" aria-selected="false"></button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="view active" id="view-overview"></section>
+  <section class="view" id="view-assess"></section>
+  <section class="view" id="view-position"></section>
+  <section class="view" id="view-strategy"></section>
+  <section class="view" id="view-plan"></section>
+  <section class="view" id="view-review"></section>
+  <section class="view" id="view-about"></section>
+  <div class="notice" id="notice"></div>
+</main>
+
+<script>
+"use strict";
+/* ---------- Model (language-neutral structure) ---------- */
+const PORTFOLIOS=[
+ {id:"foundations",domains:["sleep","fitness","energy","mind"]},
+ {id:"bonds",domains:["partner","family","friends"]},
+ {id:"means",domains:["finance","work","time"]},
+ {id:"trajectory",domains:["learning","direction"]}
+];
+const DOMAINS=PORTFOLIOS.flatMap(p=>p.domains.map(id=>({id,portfolio:p.id})));
+const PMAP=Object.fromEntries(DOMAINS.map(d=>[d.id,d.portfolio]));
+
+/* ---------- Translations ---------- */
+const I18N={
+en:{
+ tagline:"A management operating system for your life",
+ "tab.overview":"Overview","tab.assess":"Assess","tab.position":"Position","tab.strategy":"Strategy","tab.plan":"90-day plan","tab.review":"Review","tab.about":"About",
+ "sync.account":"Saved to your account","sync.device":"Saved on this device only",
+ notice:"FutureYou Life treats your life like the most important enterprise you run: twelve domains in four portfolios, one constraint at a time, ninety days per cycle. Scores and notes stay in your own private space — nobody else, including the owner of this page, can read them.",
+ portfolios:{foundations:"Foundations",bonds:"Bonds",means:"Means",trajectory:"Trajectory"},
+ domains:{sleep:"Sleep & recovery",fitness:"Fitness & movement",energy:"Nutrition & energy",mind:"Mental resilience",partner:"Partnership",family:"Family",friends:"Friends & community",finance:"Finances",work:"Work & contribution",time:"Time control",learning:"Learning & skills",direction:"Direction & meaning"},
+ defs:{
+  sleep:"Quality and consistency of sleep, and how recovered you actually feel — the system’s nightly maintenance.",
+  fitness:"Strength, stamina and how often you move — the physical capacity that carries everything else.",
+  energy:"What you eat and drink, and how steady your daily energy is as a result.",
+  mind:"Stress levels, focus, and your ability to absorb setbacks without being knocked over.",
+  partner:"The health of your closest relationship — trust, attention and shared direction (or your position toward finding one).",
+  family:"Your relationships with family — presence, care given and received, and what remains unresolved.",
+  friends:"Friendships and community — the people you could call, and how often you actually do.",
+  finance:"Income, savings, debt and runway — whether money works as a tool or as a worry.",
+  work:"Whether your work uses your abilities, rewards them fairly, and feels worth doing.",
+  time:"How much of your calendar you actually control, and who really sets your priorities.",
+  learning:"Whether you are building skills and knowledge that compound — or coasting on old capital.",
+  direction:"Clarity about where your life is heading, and whether daily life reflects it."},
+ emptyH2:"Run the enterprise you actually live in",
+ emptyLede:"FutureYou Life applies the disciplines of strategy work to your whole life: an honest baseline across twelve domains, a wanted position for each, one constraint to attack, and a ninety-day plan with weekly check-ins. The reassessments you run over time become your benchmark.",
+ emptyReadMore:"Read more about why FutureYou Life exists",
+ noBaseline:"No baseline yet",firstAssessBody:"Start with a first assessment — it takes about five minutes.",btnFirstAssess:"Run first assessment",
+ positionReport:"Position report",
+ latestLede:(d)=>`Latest assessment ${d} · filled bar is where you are, the copper tick is your wanted position.`,
+ compositeLabel:"composite / 10",assessmentsLabel:"assessments",trendLabel:"composite trend",
+ brandHint:'FutureYou Life is a management operating system — strategy, governance and execution applied to the enterprise that matters most.',
+ readMore:"Read more",constraintBadge:"constraint",
+ nextPosition:`Next: define your <a href="#" onclick="go('position');return false">wanted position</a> for each domain.`,
+ nextStrategy:`Next: choose your <a href="#" onclick="go('strategy');return false">constraint</a> for this cycle.`,
+ nextPlan:`Next: start the <a href="#" onclick="go('plan');return false">90-day plan</a>.`,
+ nextRunning:`Cycle running — keep the <a href="#" onclick="go('plan');return false">weekly check-in</a> and reassess every 4–6 weeks.`,
+ assessH2:"Assess the whole",
+ assessLede:"Score each domain 0–10 against your own standard, not anyone else’s. Be honest rather than kind — the diagnosis only works if the data does. Every assessment is kept, so your history becomes the benchmark.",
+ obsLabel:"Observations (optional)",obsPh:"What stands out? Early warning signs, things trending up or down…",
+ saveAssessment:"Save assessment",
+ lastSaved:(d)=>`Last saved ${d}. A new save adds a snapshot — it never overwrites history.`,
+ becomesBaseline:"This becomes your baseline.",
+ positionH2:"Wanted position",
+ positionLede:"Set a target score and a one-sentence definition of the position you want to hold in each domain. Targets don’t need to be 10s — a deliberate 6 in one domain funds a 9 in another. Equal diagnosis, unequal ambition.",
+ horizonLabel:"Horizon for these targets",savePosition:"Save wanted position",now:"now",
+ statementPh:"Wanted position in one sentence — what does ‘good’ concretely look like here?",
+ positionSaved:"Wanted position saved",
+ strategyH2:"Find the constraint",
+ strategyLede:"Strategy is choice under scarcity. Pick <b>one</b> constraint — the domain whose improvement would lift the most of the rest of the system — and at most two supporting moves. Everything else is deliberately left alone this cycle.",
+ largestGap:"Largest gap",
+ upstreamNote:(n)=>` Upstream candidate worth weighing: <b>${n}</b> — Foundations, time and money tend to constrain everything downstream.`,
+ pickConstraint:"constraint",pickSupport:"support",
+ strategyStatement:"Strategy statement",
+ strategyPh:"Because [constraint] is holding the system back, this cycle we will [the move], measured by [leading indicator], accepting that [what we deliberately won’t do].",
+ indicatorLabel:"Leading indicator",
+ indicatorPh:"A weekly, countable measure you control (e.g. nights in bed before 23:00)",
+ pickFirst:"Pick a constraint above to define its leading indicator.",
+ saveStrategy:"Save strategy",strategySaved:"Strategy saved",
+ planH2:"90-day plan",
+ planLede:"Translate the strategy into a small set of repeatable activities. Ninety days is long enough to move a score and short enough to stay honest.",
+ noCycle:"No active cycle",constraintWord:"Constraint",supportWord:"support",
+ startCycle:"Start a 90-day cycle today",
+ dayOf90:"day of 90",weekOf13:"week of 13",checkinsKept:"weekly check-ins kept",cycleProgress:"Cycle progress",
+ startedOn:(d)=>`Started ${d}`,
+ cycleComplete:"Cycle complete",
+ cycleCompleteBody:"Reassess first, then close this cycle to archive it and set the next one.",
+ reassess:"Reassess",closeCycle:"Close cycle",
+ weekCheckin:"This week’s check-in",
+ tickWeek:(w)=>`Tick what you kept this week (${w}). The record carries over week to week.`,
+ noActivities:"No activities yet — add the first one below.",
+ addActivity:"Add activity",activityLabel:"Activity",
+ activityPh:"Concrete and repeatable — e.g. lights out by 23:00 on weeknights",
+ domainLabel:"Domain",cadenceLabel:"Cadence",
+ cadDaily:"daily",cadWeekly:"weekly",cad3w:"3×/week",
+ addToPlan:"Add to plan",
+ planHint:"Three to five activities is plenty. More than that is a wish list, not a plan.",
+ removeActivity:"Remove activity",doneThisWeek:"Done this week",
+ reviewH2:"Review & benchmark",
+ reviewBase:"Your own history is the benchmark that matters: direction over level.",
+ reviewMulti:(n,d)=>`${n} assessments on record since ${d}.`,
+ reviewSingle:"Run your next assessment in 4–6 weeks to start the trend.",
+ compositeOverTime:"Composite over time",
+ domainMovement:"Domain movement — first vs latest",
+ thDomain:"Domain",closedCycles:"Closed cycles",
+ thCycle:"Cycle",thConstraint:"Constraint",thKept:"Check-ins kept",thClose:"Composite at close",
+ trendAfterSecond:"The trend appears after your second assessment.",
+ chartAria:"Composite score trend",
+ needsPrefix:"This step needs",needsSuffix:"first",
+ needsBody:"FutureYou Life runs in sequence: assess, set the wanted position, choose the constraint, plan the cycle.",
+ needFirstAssess:"a first assessment",needAssessPos:"an assessment and a wanted position",
+ needStrategy:"a strategy with a chosen constraint",needOneAssess:"at least one assessment",
+ ctaAssess:"Run assessment",ctaPosition:"Set wanted position",ctaStrategy:"Set strategy",
+ aboutH2:"About FutureYou Life",
+ aboutLede:"A management operating system for your life — the disciplines of strategy, governance and execution, applied to the enterprise that matters most.",
+ whyH3:"Why FutureYou Life exists",
+ whyP1:"Most capable people run their work with more discipline than their lives. A company of any seriousness has a baseline, a strategy, a budget and a review cadence; a life usually runs on defaults — whatever is loudest gets the attention, and the quiet domains erode until they break. FutureYou Life starts from a simple observation: the methods that make organisations deliberate are not reserved for organisations. Diagnosis, resource allocation, constraint thinking and execution cadence work just as well on the one enterprise you cannot resign from.",
+ whyP2:"FutureYou Life is not a habit tracker and not a wellness app. It does not ask you to improve everything at once, and it does not score you against anyone else. It asks the questions a good board would ask: where do we actually stand, where do we want to be, what single constraint is holding the system back, and what are we doing about it this quarter?",
+ modelH3:"The model",
+ modelP:"FutureYou Life views a life as one system of twelve domains in four portfolios. <b>Foundations</b> — sleep, fitness, energy and mental resilience — is the upstream portfolio that funds everything else. <b>Bonds</b> covers the relationships that hold under load: partnership, family, friends and community. <b>Means</b> is what you allocate — money, work and control over your own time. <b>Trajectory</b> is where the system is heading: learning and direction. Every domain is scored on the same honest 0–10 lens, but they are never treated as equally urgent — equal diagnosis, unequal ambition.",
+ loopH3:"The operating loop",
+ loopAssess:"<b>Assess.</b> Score all twelve domains against your own standard. Every assessment is kept, never overwritten — your history is the benchmark.",
+ loopPosition:"<b>Position.</b> Define the wanted position per domain: a target score and one sentence describing what good concretely looks like, on a horizon you choose. A deliberate 6 in one domain funds a 9 in another.",
+ loopStrategy:"<b>Strategy.</b> FutureYou Life ranks the gaps, but you choose one constraint — the domain whose improvement lifts the most of the rest — plus at most two supporting moves, each with a leading indicator you control.",
+ loopPlan:"<b>Plan.</b> A 90-day cycle with a handful of repeatable activities and a weekly check-in. Long enough to move a score, short enough to stay honest.",
+ loopReview:"<b>Review.</b> At the end of a cycle you reassess, close the books and set the next one. Over time the record shows what actually moved — direction over level.",
+ privacyH3:"Privacy",
+ privacyP:"Your scores, notes and plans are stored in your own private space, readable only by you — not by other users and not by the owner of this page. Without a signed-in account, everything stays on your device.",
+ backToOverview:"Back to overview"
+}
+};
+let lang="en";
+const t=k=>{const v=I18N[lang][k]??I18N.en[k];return v??k};
+const dn=id=>(I18N[lang].domains[id]??I18N.en.domains[id]);
+const pn=id=>(I18N[lang].portfolios[id]??I18N.en.portfolios[id]);
+const dd=id=>(I18N[lang].defs[id]??I18N.en.defs[id]);
+const cadLabel=c=>({daily:t("cadDaily"),weekly:t("cadWeekly"),"3w":t("cad3w"),"3×/week":t("cad3w"),diaria:t("cadDaily"),semanal:t("cadWeekly")}[c]||c);
+
+/* ---------- State ---------- */
+const LS_KEY="helm-state-v1";
+let state=null, docRef=null, saveTimer=null, saveChain=Promise.resolve(), lastSync=null;
+
+function blankState(){return{
+  snapshots:[], targets:{}, horizon:"",
+  strategy:{constraint:null,supports:[],statement:"",indicators:{}},
+  cycle:null, cycleHistory:[], createdAt:new Date().toISOString().slice(0,10)
+};}
+function normalize(s){
+  const b=blankState();
+  if(!s||typeof s!=="object")return b;
+  return{...b,...s,strategy:{...b.strategy,...(s.strategy||{})}};
+}
+function loadLocal(){
+  try{const raw=localStorage.getItem(LS_KEY);return raw?normalize(JSON.parse(raw)):null}catch(e){return null}
+}
+function persist(){
+  try{localStorage.setItem(LS_KEY,JSON.stringify(state))}catch(e){}
+  if(docRef){
+    clearTimeout(saveTimer);
+    saveTimer=setTimeout(()=>{
+      const body=JSON.parse(JSON.stringify(state));
+      saveChain=saveChain.then(()=>docRef.set(body)).then(()=>setSync("account"))
+        .catch(()=>setSync("device"));
+    },900);
+  }else{setSync("device")}
+}
+function setSync(key){lastSync=key;const el=document.getElementById("syncState");if(el)el.textContent=key?t("sync."+key):""}
+
+async function initStore(){
+  state=loadLocal()||blankState();
+  renderAll();
+  try{
+    const [db,user]=await Promise.all([claude.use("db"),claude.use("user")]);
+    if(db&&user){
+      const uid=await user.id();
+      if(uid){
+        docRef=db.doc("data/users/"+uid+"/helm");
+        const snap=await docRef.get();
+        if(snap.exists){
+          const remote=normalize(snap.data());
+          const localN=(state.snapshots||[]).length, remoteN=(remote.snapshots||[]).length;
+          if(remoteN>=localN){state=remote;try{localStorage.setItem(LS_KEY,JSON.stringify(state))}catch(e){}}
+          else{await docRef.set(JSON.parse(JSON.stringify(state)))}
+        }else if(state.snapshots.length||Object.keys(state.targets).length){
+          await docRef.set(JSON.parse(JSON.stringify(state)));
+        }
+        setSync("account");
+        renderAll();
+        return;
+      }
+    }
+  }catch(e){}
+  setSync("device");
+}
+
+/* ---------- Helpers ---------- */
+const latest=()=>state.snapshots.length?state.snapshots[state.snapshots.length-1]:null;
+const first=()=>state.snapshots.length?state.snapshots[0]:null;
+const score=(snap,id)=>snap&&typeof snap.scores[id]==="number"?snap.scores[id]:null;
+const fmt=n=>n==null?"–":(Math.round(n*10)/10).toFixed(1);
+function composite(snap){
+  if(!snap)return null;
+  const v=DOMAINS.map(d=>score(snap,d.id)).filter(x=>x!=null);
+  return v.length?v.reduce((a,b)=>a+b,0)/v.length:null;
+}
+function portfolioAvg(snap,pid){
+  if(!snap)return null;
+  const v=DOMAINS.filter(d=>d.portfolio===pid).map(d=>score(snap,d.id)).filter(x=>x!=null);
+  return v.length?v.reduce((a,b)=>a+b,0)/v.length:null;
+}
+function gaps(){
+  const cur=latest();if(!cur)return[];
+  return DOMAINS.map(d=>{
+    const c=score(cur,d.id), tg=state.targets[d.id]?.score;
+    return{id:d.id,portfolio:d.portfolio,current:c,target:tg,
+           gap:(tg!=null&&c!=null)?tg-c:null};
+  }).filter(g=>g.gap!=null).sort((a,b)=>b.gap-a.gap);
+}
+function isoWeek(d){
+  const date=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  const day=date.getUTCDay()||7;date.setUTCDate(date.getUTCDate()+4-day);
+  const y=date.getUTCFullYear();
+  const w=Math.ceil(((date-Date.UTC(y,0,1))/86400000+1)/7);
+  return y+"-W"+String(w).padStart(2,"0");
+}
+function cycleWeek(){
+  if(!state.cycle)return 0;
+  const days=Math.floor((Date.now()-new Date(state.cycle.start).getTime())/86400000);
+  return Math.min(13,Math.max(1,Math.floor(days/7)+1));
+}
+function cycleDay(){
+  if(!state.cycle)return 0;
+  return Math.floor((Date.now()-new Date(state.cycle.start).getTime())/86400000)+1;
+}
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function info(id){const tip=dd(id);if(!tip)return"";
+ return `<span class="info" tabindex="0" role="note" aria-label="${esc(dn(id))}: ${esc(tip)}" data-tip="${esc(tip)}">i</span>`}
+
+/* ---------- Chrome (static UI text) ---------- */
+function applyChrome(){
+  document.documentElement.lang=lang;
+  document.getElementById("tagline").textContent=t("tagline");
+  document.getElementById("notice").textContent=t("notice");
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.textContent=t("tab."+b.dataset.v));
+  setSync(lastSync);
+}
+
+/* ---------- Views ---------- */
+function renderAll(){["overview","assess","position","strategy","plan","review","about"].forEach(v=>RENDER[v]())}
+
+const RENDER={
+overview(){
+  const el=document.getElementById("view-overview");
+  const cur=latest();
+  if(!cur){
+    el.innerHTML=`<h2>${t("emptyH2")}</h2>
+    <p class="lede">${t("emptyLede")} <a href="#" onclick="go('about');return false">${t("emptyReadMore")}</a>.</p>
+    <div class="empty"><h3>${t("noBaseline")}</h3><p>${t("firstAssessBody")}</p>
+    <button class="btn" onclick="go('assess')">${t("btnFirstAssess")}</button></div>`;
+    return;
+  }
+  const comp=composite(cur);
+  const cs=state.strategy.constraint;
+  let rows="";
+  for(const p of PORTFOLIOS){
+    const pavg=portfolioAvg(cur,p.id);
+    rows+=`<div class="group"><div class="group-head"><h3>${pn(p.id)}</h3><span class="num">${fmt(pavg)}</span></div>`;
+    for(const did of p.domains){
+      const c=score(cur,did)??0, tg=state.targets[did]?.score;
+      rows+=`<div class="row${cs===did?" constraint":""}">
+        <div class="label">${dn(did)}${info(did)}${cs===did?`<span class="badge">${t("constraintBadge")}</span>`:""}</div>
+        <div class="bullet"><div class="fill" style="width:${c*10}%"></div>${tg!=null?`<div class="tick" style="left:calc(${tg*10}% - 1px)"></div>`:""}</div>
+        <div class="figs"><b>${fmt(c)}</b>${tg!=null?` / ${fmt(tg)}`:""}</div>
+      </div>`;
+    }
+    rows+=`</div>`;
+  }
+  const trend=trendSvg(240,54,true);
+  el.innerHTML=`
+  <div class="grid2" style="align-items:end">
+    <div><h2>${t("positionReport")}</h2>
+      <p class="lede">${t("latestLede")(esc(cur.date))}</p></div>
+    <div class="statline" style="justify-content:flex-end">
+      <div><span class="num">${fmt(comp)}</span><span>${t("compositeLabel")}</span></div>
+      <div><span class="num">${state.snapshots.length}</span><span>${t("assessmentsLabel")}</span></div>
+      <div style="min-width:150px">${trend}<span>${t("trendLabel")}</span></div>
+    </div>
+  </div>
+  <div class="ledger">${rows}</div>
+  ${nextStepHint()}
+  <p class="hint">${t("brandHint")} <a href="#" onclick="go('about');return false">${t("readMore")}</a>.</p>`;
+},
+
+assess(){
+  const el=document.getElementById("view-assess");
+  const base=latest();
+  let f="";
+  for(const p of PORTFOLIOS){
+    f+=`<h3 class="group-title">${pn(p.id)}</h3><div class="panel" style="margin-top:6px">`;
+    for(const did of p.domains){
+      const v=score(base,did)??5;
+      f+=`<div class="slider-row">
+        <div>${dn(did)}${info(did)}</div>
+        <input type="range" min="0" max="10" step="1" value="${v}" data-dom="${did}"
+          aria-label="${esc(dn(did))}" oninput="this.closest('.slider-row').querySelector('.num').textContent=this.value">
+        <div class="num">${v}</div>
+      </div>`;
+    }
+    f+=`</div>`;
+  }
+  el.innerHTML=`<h2>${t("assessH2")}</h2>
+  <p class="lede">${t("assessLede")}</p>
+  ${f}
+  <div class="panel">
+    <label class="f" for="assessNote">${t("obsLabel")}</label>
+    <textarea id="assessNote" placeholder="${esc(t("obsPh"))}"></textarea>
+    <div style="margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <button class="btn" onclick="saveAssessment()">${t("saveAssessment")}</button>
+      <span class="hint">${state.snapshots.length?t("lastSaved")(esc(latest().date)):t("becomesBaseline")}</span>
+    </div>
+  </div>`;
+},
+
+position(){
+  const el=document.getElementById("view-position");
+  const cur=latest();
+  if(!cur){el.innerHTML=emptyNeeds(t("needFirstAssess"),"assess",t("ctaAssess"));return}
+  let f="";
+  for(const p of PORTFOLIOS){
+    f+=`<h3 class="group-title">${pn(p.id)}</h3><div class="panel" style="margin-top:6px">`;
+    for(const did of p.domains){
+      const c=score(cur,did), tg=state.targets[did]||{};
+      f+=`<div style="padding:8px 0;border-bottom:1px solid var(--line-soft)">
+        <div class="slider-row" style="border:0;padding:0">
+          <div>${dn(did)}${info(did)}<small style="display:block;color:var(--muted)">${t("now")} ${fmt(c)}</small></div>
+          <input type="range" min="0" max="10" step="1" value="${tg.score??Math.min(10,Math.round((c??5)+2))}" data-target="${did}"
+            aria-label="${esc(dn(did))}" oninput="this.closest('div').querySelector('.num').textContent=this.value">
+          <div class="num">${tg.score??Math.min(10,Math.round((c??5)+2))}</div>
+        </div>
+        <input type="text" data-statement="${did}" value="${esc(tg.statement||"")}"
+          placeholder="${esc(t("statementPh"))}" style="margin-top:6px">
+      </div>`;
+    }
+    f+=`</div>`;
+  }
+  el.innerHTML=`<h2>${t("positionH2")}</h2>
+  <p class="lede">${t("positionLede")}</p>
+  <div class="panel" style="display:flex;gap:14px;align-items:end;flex-wrap:wrap">
+    <div style="flex:1;min-width:220px"><label class="f" for="horizon">${t("horizonLabel")}</label>
+    <input type="date" id="horizon" value="${esc(state.horizon||"")}"></div>
+    <button class="btn" onclick="saveTargets()">${t("savePosition")}</button>
+  </div>
+  ${f}
+  <div style="display:flex;gap:10px;align-items:center"><button class="btn" onclick="saveTargets()">${t("savePosition")}</button><span id="posOk"></span></div>`;
+},
+
+strategy(){
+  const el=document.getElementById("view-strategy");
+  const g=gaps();
+  if(!g.length){el.innerHTML=emptyNeeds(t("needAssessPos"),"position",t("ctaPosition"));return}
+  const s=state.strategy;
+  const suggested=g[0];
+  const found=g.filter(x=>x.portfolio==="foundations"||x.id==="time"||x.id==="finance");
+  const upstream=found.length?found[0]:null;
+  let list="";
+  g.slice(0,8).forEach((x,i)=>{
+    list+=`<li>
+      <span class="hint">${i+1}</span>
+      <span>${dn(x.id)}<small style="display:block;color:var(--muted);font-size:.78rem">${pn(x.portfolio)} · ${fmt(x.current)} → ${fmt(x.target)}</small></span>
+      <span class="gapnum">+${fmt(x.gap)}</span>
+      <span class="pick">
+        <label><input type="radio" name="constraint" value="${x.id}" ${s.constraint===x.id?"checked":""}>${t("pickConstraint")}</label>
+        <label><input type="checkbox" data-support="${x.id}" ${s.supports.includes(x.id)?"checked":""}>${t("pickSupport")}</label>
+      </span>
+    </li>`;
+  });
+  const chosen=[s.constraint,...s.supports].filter(Boolean);
+  let ind="";
+  chosen.forEach(id=>{
+    ind+=`<label class="f">${t("indicatorLabel")} — ${dn(id)}</label>
+    <input type="text" data-indicator="${id}" value="${esc(s.indicators[id]||"")}"
+      placeholder="${esc(t("indicatorPh"))}">`;
+  });
+  el.innerHTML=`<h2>${t("strategyH2")}</h2>
+  <p class="lede">${t("strategyLede")}</p>
+  <div class="panel">
+    <div class="hint">${t("largestGap")}: <b>${dn(suggested.id)}</b> (+${fmt(suggested.gap)}).${upstream&&upstream.id!==suggested.id?t("upstreamNote")(dn(upstream.id)):""}</div>
+    <ol class="ranklist">${list}</ol>
+  </div>
+  <div class="panel">
+    <h3>${t("strategyStatement")}</h3>
+    <textarea id="strategyStatement" placeholder="${esc(t("strategyPh"))}">${esc(s.statement||"")}</textarea>
+    ${ind||`<p class="hint">${t("pickFirst")}</p>`}
+    <div style="margin-top:12px;display:flex;gap:10px;align-items:center"><button class="btn" onclick="saveStrategy()">${t("saveStrategy")}</button><span id="stratOk"></span></div>
+  </div>`;
+  el.querySelectorAll('input[name=constraint]').forEach(r=>r.addEventListener("change",()=>{captureStrategyInputs();RENDER.strategy()}));
+  el.querySelectorAll('[data-support]').forEach(c=>c.addEventListener("change",e=>{
+    captureStrategyInputs();
+    const checked=[...el.querySelectorAll('[data-support]:checked')].map(x=>x.dataset.support);
+    if(checked.length>2){e.target.checked=false;return}
+    state.strategy.supports=checked.filter(id=>id!==state.strategy.constraint);
+    RENDER.strategy();
+  }));
+},
+
+plan(){
+  const el=document.getElementById("view-plan");
+  const s=state.strategy;
+  if(!s.constraint){el.innerHTML=emptyNeeds(t("needStrategy"),"strategy",t("ctaStrategy"));return}
+  const c=state.cycle;
+  if(!c){
+    el.innerHTML=`<h2>${t("planH2")}</h2>
+    <p class="lede">${t("planLede")}</p>
+    <div class="empty"><h3>${t("noCycle")}</h3>
+      <p>${t("constraintWord")}: <b>${dn(s.constraint)}</b>${s.supports.length?` · ${t("supportWord")}: ${s.supports.map(dn).join(", ")}`:""}</p>
+      <button class="btn" onclick="startCycle()">${t("startCycle")}</button></div>`;
+    return;
+  }
+  const wk=cycleWeek(), day=cycleDay(), wkKey=isoWeek(new Date());
+  const done=c.checks?.[wkKey]||{};
+  const focus=[s.constraint,...s.supports];
+  let acts="";
+  c.activities.forEach(a=>{
+    acts+=`<div class="activity">
+      <input type="checkbox" ${done[a.id]?"checked":""} onchange="toggleCheck('${a.id}',this.checked)" aria-label="${t("doneThisWeek")}: ${esc(a.text)}">
+      <div>${esc(a.text)}</div>
+      <div class="meta">${dn(a.domainId)??""} · ${esc(cadLabel(a.cadence))}</div>
+      <button class="del" title="${t("removeActivity")}" onclick="removeActivity('${a.id}')">✕</button>
+    </div>`;
+  });
+  const weeksElapsed=wk;
+  const possible=c.activities.length*weeksElapsed;
+  let completed=0;
+  Object.values(c.checks||{}).forEach(w=>completed+=Object.values(w).filter(Boolean).length);
+  const pct=possible?Math.min(100,Math.round(100*completed/possible)):0;
+  const over=day>90;
+  let opts="";focus.forEach(id=>opts+=`<option value="${id}">${dn(id)}</option>`);
+  el.innerHTML=`<h2>${t("planH2")}</h2>
+  <div class="statline">
+    <div><span class="num">${Math.min(day,90)}</span><span>${t("dayOf90")}</span></div>
+    <div><span class="num">${wk}</span><span>${t("weekOf13")}</span></div>
+    <div><span class="num">${pct}%</span><span>${t("checkinsKept")}</span></div>
+  </div>
+  <div class="progress" role="img" aria-label="${t("cycleProgress")}"><i style="width:${Math.min(100,Math.round(day/90*100))}%"></i></div>
+  <p class="hint">${t("startedOn")(esc(c.start))} · ${t("constraintWord").toLowerCase()}: <b>${dn(s.constraint)}</b>${s.supports.length?` · ${t("supportWord")}: ${s.supports.map(dn).join(", ")}`:""}</p>
+  ${over?`<div class="panel flash"><h3>${t("cycleComplete")}</h3><p>${t("cycleCompleteBody")}</p>
+    <button class="btn secondary" onclick="go('assess')">${t("reassess")}</button>
+    <button class="btn" onclick="closeCycle()">${t("closeCycle")}</button></div>`:""}
+  <div class="panel">
+    <h3>${t("weekCheckin")}</h3>
+    <p class="hint">${t("tickWeek")(esc(wkKey))}</p>
+    ${acts||`<p class="hint">${t("noActivities")}</p>`}
+  </div>
+  <div class="panel">
+    <h3>${t("addActivity")}</h3>
+    <div class="grid2">
+      <div><label class="f" for="actText">${t("activityLabel")}</label>
+      <input type="text" id="actText" placeholder="${esc(t("activityPh"))}"></div>
+      <div class="grid2">
+        <div><label class="f" for="actDom">${t("domainLabel")}</label><select id="actDom">${opts}</select></div>
+        <div><label class="f" for="actCad">${t("cadenceLabel")}</label><select id="actCad"><option value="daily">${t("cadDaily")}</option><option value="weekly" selected>${t("cadWeekly")}</option><option value="3w">${t("cad3w")}</option></select></div>
+      </div>
+    </div>
+    <div style="margin-top:10px"><button class="btn" onclick="addActivity()">${t("addToPlan")}</button>
+    <span class="hint" style="margin-left:10px">${t("planHint")}</span></div>
+  </div>`;
+},
+
+review(){
+  const el=document.getElementById("view-review");
+  if(state.snapshots.length<1){el.innerHTML=emptyNeeds(t("needOneAssess"),"assess",t("ctaAssess"));return}
+  const f=first(),l=latest();
+  let rows="";
+  for(const d of DOMAINS){
+    const a=score(f,d.id),b=score(l,d.id);
+    const delta=(a!=null&&b!=null)?b-a:null;
+    const cls=delta>0?"delta-up":delta<0?"delta-down":"";
+    rows+=`<tr><td>${dn(d.id)}</td><td>${fmt(a)}</td><td>${fmt(b)}</td>
+      <td class="${cls}">${delta==null?"–":(delta>0?"+":"")+fmt(delta)}</td></tr>`;
+  }
+  let hist="";
+  (state.cycleHistory||[]).slice().reverse().forEach(h=>{
+    hist+=`<tr><td>${esc(h.start)} – ${esc(h.end)}</td><td>${h.constraint?dn(h.constraint):""}</td><td>${h.kept}%</td><td>${fmt(h.compositeAtClose)}</td></tr>`;
+  });
+  el.innerHTML=`<h2>${t("reviewH2")}</h2>
+  <p class="lede">${t("reviewBase")} ${state.snapshots.length>1?t("reviewMulti")(state.snapshots.length,esc(f.date)):t("reviewSingle")}</p>
+  <div class="panel chartbox"><h3>${t("compositeOverTime")}</h3>${trendSvg(640,160,false)}</div>
+  <div class="panel"><h3>${t("domainMovement")}</h3>
+  <table class="rev"><thead><tr><th>${t("thDomain")}</th><th>${esc(f.date)}</th><th>${esc(l.date)}</th><th>Δ</th></tr></thead><tbody>${rows}</tbody></table></div>
+  ${hist?`<div class="panel"><h3>${t("closedCycles")}</h3>
+  <table class="rev"><thead><tr><th>${t("thCycle")}</th><th>${t("thConstraint")}</th><th>${t("thKept")}</th><th>${t("thClose")}</th></tr></thead><tbody>${hist}</tbody></table></div>`:""}
+  `;
+},
+
+about(){
+  const el=document.getElementById("view-about");
+  el.innerHTML=`<h2>${t("aboutH2")}</h2>
+  <p class="lede">${t("aboutLede")}</p>
+  <div class="panel">
+    <h3>${t("whyH3")}</h3>
+    <p>${t("whyP1")}</p>
+    <p>${t("whyP2")}</p>
+  </div>
+  <div class="panel">
+    <h3>${t("modelH3")}</h3>
+    <p>${t("modelP")}</p>
+  </div>
+  <div class="panel">
+    <h3>${t("loopH3")}</h3>
+    <p>${t("loopAssess")}</p>
+    <p>${t("loopPosition")}</p>
+    <p>${t("loopStrategy")}</p>
+    <p>${t("loopPlan")}</p>
+    <p>${t("loopReview")}</p>
+  </div>
+  <div class="panel">
+    <h3>${t("privacyH3")}</h3>
+    <p>${t("privacyP")}</p>
+  </div>
+  <button class="btn secondary" onclick="go('overview')">${t("backToOverview")}</button>`;
+}
+};
+
+function emptyNeeds(what,tab,cta){
+  return `<div class="empty"><h3>${t("needsPrefix")} ${what} ${t("needsSuffix")}</h3>
+  <p>${t("needsBody")}</p>
+  <button class="btn" onclick="go('${tab}')">${cta}</button></div>`;
+}
+function nextStepHint(){
+  if(!Object.keys(state.targets).length)return `<p class="hint">${t("nextPosition")}</p>`;
+  if(!state.strategy.constraint)return `<p class="hint">${t("nextStrategy")}</p>`;
+  if(!state.cycle)return `<p class="hint">${t("nextPlan")}</p>`;
+  return `<p class="hint">${t("nextRunning")}</p>`;
+}
+
+/* Trend sparkline / chart */
+function trendSvg(w,h,bare){
+  const pts=state.snapshots.map(s=>composite(s)).filter(v=>v!=null);
+  if(pts.length<2)return bare?`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><line x1="0" y1="${h/2}" x2="${w}" y2="${h/2}" stroke="var(--line)" stroke-dasharray="3 4"/></svg>`
+    :`<p class="hint">${t("trendAfterSecond")}</p>`;
+  const pad=bare?4:22;
+  const min=0,max=10;
+  const xs=i=>pad+i*( (w-2*pad)/(pts.length-1) );
+  const ys=v=>h-pad-((v-min)/(max-min))*(h-2*pad);
+  let path="M"+pts.map((v,i)=>`${xs(i).toFixed(1)},${ys(v).toFixed(1)}`).join(" L");
+  let dots=pts.map((v,i)=>`<circle cx="${xs(i).toFixed(1)}" cy="${ys(v).toFixed(1)}" r="3" fill="var(--fir)"/>`).join("");
+  let axis=bare?"":`<line x1="${pad}" y1="${ys(0)}" x2="${w-pad}" y2="${ys(0)}" stroke="var(--line)"/>
+    <line x1="${pad}" y1="${ys(5)}" x2="${w-pad}" y2="${ys(5)}" stroke="var(--line)" stroke-dasharray="2 5"/>
+    <text x="${pad}" y="${ys(5)-5}" fill="var(--muted)" font-size="10" font-family="Archivo">5</text>
+    <text x="${pad}" y="${ys(10)+10}" fill="var(--muted)" font-size="10" font-family="Archivo">10</text>`;
+  const labels=bare?"":state.snapshots.map((s,i)=>`<text x="${xs(i).toFixed(1)}" y="${h-4}" fill="var(--muted)" font-size="9" font-family="Archivo" text-anchor="middle">${esc(s.date.slice(5))}</text>`).join("");
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="max-width:100%" role="img" aria-label="${t("chartAria")}">
+    ${axis}<path d="${path}" fill="none" stroke="var(--fir)" stroke-width="2"/>${dots}${labels}</svg>`;
+}
+
+/* ---------- Actions ---------- */
+function go(v){
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.v===v?"true":"false"));
+  document.querySelectorAll("section.view").forEach(s=>s.classList.toggle("active",s.id==="view-"+v));
+  window.scrollTo({top:0});
+}
+document.getElementById("tabs").addEventListener("click",e=>{
+  const b=e.target.closest("button");if(b)go(b.dataset.v);
+});
+/* Tap support for info tooltips (hover has no meaning on touch) */
+document.addEventListener("click",e=>{
+  const i=e.target.closest(".info");
+  document.querySelectorAll(".info.open").forEach(x=>{if(x!==i)x.classList.remove("open")});
+  if(i)i.classList.toggle("open");
+});
+
+function saveAssessment(){
+  const scores={};
+  document.querySelectorAll("#view-assess [data-dom]").forEach(r=>scores[r.dataset.dom]=Number(r.value));
+  const note=document.getElementById("assessNote").value.trim();
+  state.snapshots.push({id:"s"+Date.now(),date:new Date().toISOString().slice(0,10),scores,note});
+  persist();renderAll();go("overview");
+}
+function saveTargets(){
+  document.querySelectorAll("#view-position [data-target]").forEach(r=>{
+    const id=r.dataset.target;
+    state.targets[id]=state.targets[id]||{};
+    state.targets[id].score=Number(r.value);
+  });
+  document.querySelectorAll("#view-position [data-statement]").forEach(x=>{
+    const id=x.dataset.statement;
+    state.targets[id]=state.targets[id]||{};
+    state.targets[id].statement=x.value.trim();
+  });
+  state.horizon=document.getElementById("horizon").value;
+  persist();renderAll();
+  const ok=document.getElementById("posOk");if(ok){ok.textContent=t("positionSaved");ok.className="ok";setTimeout(()=>ok.textContent="",2500)}
+}
+function captureStrategyInputs(){
+  const el=document.getElementById("view-strategy");
+  const r=el.querySelector('input[name=constraint]:checked');
+  if(r)state.strategy.constraint=r.value;
+  state.strategy.supports=[...el.querySelectorAll('[data-support]:checked')].map(x=>x.dataset.support).filter(id=>id!==state.strategy.constraint).slice(0,2);
+  const st=el.querySelector("#strategyStatement");if(st)state.strategy.statement=st.value;
+  el.querySelectorAll("[data-indicator]").forEach(i=>state.strategy.indicators[i.dataset.indicator]=i.value.trim());
+}
+function saveStrategy(){
+  captureStrategyInputs();
+  persist();renderAll();
+  const ok=document.getElementById("stratOk");if(ok){ok.textContent=t("strategySaved");ok.className="ok";setTimeout(()=>ok.textContent="",2500)}
+}
+function startCycle(){
+  state.cycle={start:new Date().toISOString().slice(0,10),activities:[],checks:{}};
+  persist();RENDER.plan();
+}
+function addActivity(){
+  const text=document.getElementById("actText").value.trim();
+  if(!text)return;
+  state.cycle.activities.push({id:"a"+Date.now(),text,domainId:document.getElementById("actDom").value,cadence:document.getElementById("actCad").value});
+  persist();RENDER.plan();
+}
+function removeActivity(id){
+  state.cycle.activities=state.cycle.activities.filter(a=>a.id!==id);
+  persist();RENDER.plan();
+}
+function toggleCheck(id,on){
+  const wk=isoWeek(new Date());
+  state.cycle.checks=state.cycle.checks||{};
+  state.cycle.checks[wk]=state.cycle.checks[wk]||{};
+  state.cycle.checks[wk][id]=!!on;
+  persist();RENDER.plan();
+}
+function closeCycle(){
+  const c=state.cycle;if(!c)return;
+  let completed=0;Object.values(c.checks||{}).forEach(w=>completed+=Object.values(w).filter(Boolean).length);
+  const possible=Math.max(1,c.activities.length*13);
+  state.cycleHistory.push({
+    start:c.start,end:new Date().toISOString().slice(0,10),
+    constraint:state.strategy.constraint,
+    kept:Math.min(100,Math.round(100*completed/possible)),
+    compositeAtClose:composite(latest())
+  });
+  state.cycle=null;
+  persist();renderAll();go("review");
+}
+
+applyChrome();
+initStore();
+</script>
+</body>
+</html>
